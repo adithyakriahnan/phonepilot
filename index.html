@@ -1,1189 +1,759 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PhonePilot AI - Intelligent Smartphone Recommendation Engine</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#EEF2FF',
-                            100: '#E0E7FF',
-                            500: '#6366F1',
-                            600: '#4F46E5',
-                            700: '#4338CA',
-                            900: '#312E81',
-                        },
-                        dark: {
-                            bg: '#0B0F17',
-                            card: '#111827',
-                            border: '#1F2937',
-                            accent: '#1E293B'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body {
-            background-color: #0B0F17;
-            color: #F3F4F6;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-        .glass-panel {
-            background: rgba(17, 24, 39, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .glass-card {
-            background: rgba(30, 41, 59, 0.5);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.6);
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(99, 102, 241, 0.4);
-            border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(99, 102, 241, 0.7);
-        }
-        input[type=range] {
-            accent-color: #6366F1;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhonePilot AI - Smart Mobile Recommendation & Comparison Engine</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-hover: #334155;
+      --primary: #3b82f6;
+      --primary-accent: #60a5fa;
+      --accent: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      line-height: 1.5;
+      padding-bottom: 60px;
+    }
+
+    header {
+      background-color: rgba(30, 41, 59, 0.8);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-accent);
+    }
+
+    .logo i {
+      font-size: 1.75rem;
+    }
+
+    nav {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.5rem 1.25rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-btn:hover, .nav-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .badge {
+      background: var(--accent);
+      color: #000;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.1rem 0.5rem;
+      border-radius: 1rem;
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Controls & Sliders Layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .filter-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      height: fit-content;
+    }
+
+    .filter-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .filter-group label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .filter-group input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary-accent);
+    }
+
+    .filter-group select, .search-input {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--bg-main);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      border-radius: 0.5rem;
+      outline: none;
+    }
+
+    .reset-btn {
+      width: 100%;
+      padding: 0.75rem;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .reset-btn:hover {
+      background: var(--bg-card-hover);
+      color: var(--text-main);
+    }
+
+    /* Phone Cards Grid */
+    .phones-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .phone-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .phone-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary-accent);
+    }
+
+    .suitability-badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: var(--accent);
+      color: #052e16;
+      font-weight: 800;
+      padding: 0.25rem 0.6rem;
+      border-radius: 2rem;
+      font-size: 0.85rem;
+    }
+
+    .phone-brand {
+      color: var(--primary-accent);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .phone-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0.25rem 0 0.5rem 0;
+      padding-right: 3rem;
+    }
+
+    .phone-price {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .specs-list {
+      list-style: none;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .specs-list li {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .specs-list i {
+      width: 16px;
+      color: var(--primary-accent);
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-action {
+      flex: 1;
+      padding: 0.6rem;
+      border: 1px solid var(--border-color);
+      background: var(--bg-main);
+      color: var(--text-main);
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .btn-action:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .btn-action.active {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+
+    /* Comparison Table Styling */
+    .comparison-container {
+      overflow-x: auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 1.5rem;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .comparison-table th, .comparison-table td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      min-width: 200px;
+    }
+
+    .comparison-table th {
+      color: var(--primary-accent);
+      font-size: 1rem;
+    }
+
+    .comparison-table td:first-child, .comparison-table th:first-child {
+      position: sticky;
+      left: 0;
+      background: var(--bg-card);
+      z-index: 10;
+      font-weight: 700;
+      min-width: 150px;
+      border-right: 1px solid var(--border-color);
+    }
+
+    /* Views visibility */
+    .view-container {
+      display: none;
+    }
+    .view-container.active {
+      display: block;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col custom-scrollbar">
+<body>
 
-    <header class="sticky top-0 z-50 glass-panel border-b border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('recommendations')">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                    <i data-lucide="smartphone" class="w-6 h-6 text-white"></i>
-                </div>
-                <div>
-                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-indigo-400">PhonePilot AI</span>
-                    <span class="text-xs text-indigo-400 block -mt-1 font-medium">Smart Specs Matcher</span>
-                </div>
-            </div>
-            
-            <nav class="hidden md:flex items-center space-x-1">
-                <button id="nav-recs" onclick="switchTab('recommendations')" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-indigo-600 text-white flex items-center space-x-2">
-                    <i data-lucide="sparkles" class="w-4 h-4"></i>
-                    <span>Recommendations</span>
-                </button>
-                <button id="nav-catalog" onclick="switchTab('catalog')" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 transition-colors flex items-center space-x-2">
-                    <i data-lucide="grid" class="w-4 h-4"></i>
-                    <span>Full Catalog (<span id="total-count">0</span>)</span>
-                </button>
-                <button id="nav-compare" onclick="switchTab('compare')" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 transition-colors flex items-center space-x-2 relative">
-                    <i data-lucide="columns" class="w-4 h-4"></i>
-                    <span>Compare</span>
-                    <span id="compare-badge" class="ml-1 bg-indigo-500 text-white text-xs px-1.5 py-0.5 rounded-full hidden">0</span>
-                </button>
-            </nav>
+  <header>
+    <div class="nav-container">
+      <div class="logo">
+        <i class="fa-solid fa-mobile-screen-button"></i>
+        <span>PhonePilot <span style="color:var(--accent); font-size: 0.8rem; vertical-align: super;">AI</span></span>
+      </div>
+      <nav>
+        <button class="nav-btn active" onclick="switchTab('recommendations')">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Recommendation Engine
+        </button>
+        <button class="nav-btn" onclick="switchTab('catalog')">
+          <i class="fa-solid fa-list-ul"></i> Catalog
+        </button>
+        <button class="nav-btn" onclick="switchTab('compare')">
+          <i class="fa-solid fa-code-compare"></i> Compare <span class="badge" id="compare-count">0</span>
+        </button>
+      </nav>
+    </div>
+  </header>
 
-            <div class="flex items-center space-x-3">
-                <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-gray-400 hover:text-white">
-                    <i data-lucide="menu" class="w-6 h-6"></i>
-                </button>
-            </div>
+  <main>
+    <!-- RECOMMENDATION VIEW -->
+    <div id="recommendations-view" class="view-container active">
+      <div class="dashboard-grid">
+        <div class="filter-panel">
+          <h3 style="margin-bottom: 1rem; font-size: 1.1rem;"><i class="fa-solid fa-sliders"></i> User Preference Profile</h3>
+          
+          <div class="filter-group">
+            <label>Max Budget: <span id="budget-val">₹1,50,000</span></label>
+            <input type="range" id="budget-slider" min="8000" max="200000" step="2000" value="150000" oninput="updateFilters()">
+          </div>
+
+          <div class="filter-group">
+            <label>Brand Filter</label>
+            <select id="brand-select" onchange="updateFilters()">
+              <option value="ALL">All Brands</option>
+              <option value="Apple">Apple</option>
+              <option value="Samsung">Samsung</option>
+              <option value="OnePlus">OnePlus</option>
+              <option value="Xiaomi">Xiaomi / Poco / Redmi</option>
+              <option value="Vivo">Vivo</option>
+              <option value="iQOO">iQOO</option>
+              <option value="Realme">Realme</option>
+              <option value="Motorola">Motorola</option>
+              <option value="Google">Google</option>
+              <option value="Nothing">Nothing</option>
+            </select>
+          </div>
+
+          <hr style="border-color: var(--border-color); margin: 1rem 0;">
+
+          <h4 style="margin-bottom: 1rem; font-size: 0.95rem; color: var(--primary-accent);">Feature Priorities (1-10)</h4>
+
+          <div class="filter-group">
+            <label>Camera Quality: <span id="weight-cam-val">5</span></label>
+            <input type="range" id="weight-cam" min="1" max="10" value="5" oninput="updateFilters()">
+          </div>
+
+          <div class="filter-group">
+            <label>Gaming & Speed: <span id="weight-perf-val">5</span></label>
+            <input type="range" id="weight-perf" min="1" max="10" value="5" oninput="updateFilters()">
+          </div>
+
+          <div class="filter-group">
+            <label>Battery Life: <span id="weight-bat-val">5</span></label>
+            <input type="range" id="weight-bat" min="1" max="10" value="5" oninput="updateFilters()">
+          </div>
+
+          <div class="filter-group">
+            <label>Display Quality: <span id="weight-disp-val">5</span></label>
+            <input type="range" id="weight-disp" min="1" max="10" value="5" oninput="updateFilters()">
+          </div>
+
+          <button class="reset-btn" onclick="resetFilters()"><i class="fa-solid fa-rotate-left"></i> Reset Profile</button>
         </div>
 
-        <div id="mobile-menu" class="hidden md:hidden glass-panel border-b border-gray-800 px-4 pt-2 pb-4 space-y-2">
-            <button onclick="switchTab('recommendations'); toggleMobileMenu();" class="w-full px-4 py-2.5 rounded-lg text-left text-sm font-medium text-white bg-indigo-600 flex items-center space-x-2">
-                <i data-lucide="sparkles" class="w-4 h-4"></i>
-                <span>Recommendations</span>
-            </button>
-            <button onclick="switchTab('catalog'); toggleMobileMenu();" class="w-full px-4 py-2.5 rounded-lg text-left text-sm font-medium text-gray-300 hover:bg-gray-800 flex items-center space-x-2">
-                <i data-lucide="grid" class="w-4 h-4"></i>
-                <span>Full Catalog</span>
-            </button>
-            <button onclick="switchTab('compare'); toggleMobileMenu();" class="w-full px-4 py-2.5 rounded-lg text-left text-sm font-medium text-gray-300 hover:bg-gray-800 flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                    <i data-lucide="columns" class="w-4 h-4"></i>
-                    <span>Compare Phones</span>
-                </div>
-                <span id="mobile-compare-badge" class="bg-indigo-500 text-white text-xs px-2 py-0.5 rounded-full hidden">0</span>
-            </button>
+        <div>
+          <div class="section-title">
+            <i class="fa-solid fa-bullseye" style="color: var(--accent);"></i>
+            <span>Top Matched Smartphones</span>
+          </div>
+          <div class="phones-grid" id="recommendations-grid"></div>
         </div>
-    </header>
-
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-
-        <div id="tab-recommendations" class="space-y-6">
-            
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                
-                <div class="lg:col-span-4 glass-panel rounded-2xl p-5 space-y-5 border border-indigo-500/20 shadow-xl">
-                    <div class="flex items-center justify-between pb-3 border-b border-gray-800">
-                        <div class="flex items-center space-x-2">
-                            <i data-lucide="sliders" class="w-5 h-5 text-indigo-400"></i>
-                            <h2 class="font-bold text-lg text-white">Your Preferences</h2>
-                        </div>
-                        <button onclick="resetPreferences()" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium">Reset</button>
-                    </div>
-
-                    <form id="preferences-form" onsubmit="event.preventDefault(); calculateRecommendations();" class="space-y-4">
-                        
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <label class="text-gray-300 font-medium">Max Budget (INR)</label>
-                                <span id="budget-value" class="font-bold text-indigo-400">₹45,000</span>
-                            </div>
-                            <input type="range" id="pref-budget" min="8000" max="200000" step="2000" value="45000" class="w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer" oninput="updateBudgetLabel(this.value)">
-                            <div class="flex justify-between text-[10px] text-gray-500 mt-1">
-                                <span>₹8K</span>
-                                <span>₹50K</span>
-                                <span>₹100K</span>
-                                <span>₹200K+</span>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-1.5">Brand Preference</label>
-                            <select id="pref-brand" class="w-full bg-dark-card border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-indigo-500">
-                                <option value="All">All Brands</option>
-                                <option value="Apple">Apple</option>
-                                <option value="Samsung">Samsung</option>
-                                <option value="OnePlus">OnePlus</option>
-                                <option value="Xiaomi">Xiaomi / Redmi</option>
-                                <option value="iQOO">iQOO</option>
-                                <option value="Realme">Realme</option>
-                                <option value="Nothing">Nothing</option>
-                                <option value="Google">Google Pixel</option>
-                                <option value="Vivo">Vivo</option>
-                                <option value="Oppo">Oppo</option>
-                                <option value="Motorola">Motorola</option>
-                            </select>
-                        </div>
-
-                        <hr class="border-gray-800">
-
-                        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Priority Weights (1-10)</p>
-
-                        <div class="space-y-3 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
-                            
-                            <div>
-                                <div class="flex justify-between text-xs mb-1">
-                                    <span class="text-gray-300 flex items-center space-x-1">
-                                        <i data-lucide="camera" class="w-3.5 h-3.5 text-indigo-400 mr-1"></i> Camera Quality
-                                    </span>
-                                    <span id="weight-camera-val" class="font-semibold text-gray-300">8</span>
-                                </div>
-                                <input type="range" id="weight-camera" min="1" max="10" value="8" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('weight-camera-val').innerText=this.value">
-                            </div>
-
-                            <div>
-                                <div class="flex justify-between text-xs mb-1">
-                                    <span class="text-gray-300 flex items-center space-x-1">
-                                        <i data-lucide="cpu" class="w-3.5 h-3.5 text-indigo-400 mr-1"></i> Processor & Speed
-                                    </span>
-                                    <span id="weight-performance-val" class="font-semibold text-gray-300">8</span>
-                                </div>
-                                <input type="range" id="weight-performance" min="1" max="10" value="8" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('weight-performance-val').innerText=this.value">
-                            </div>
-
-                            <div>
-                                <div class="flex justify-between text-xs mb-1">
-                                    <span class="text-gray-300 flex items-center space-x-1">
-                                        <i data-lucide="gamepad-2" class="w-3.5 h-3.5 text-indigo-400 mr-1"></i> Gaming Performance
-                                    </span>
-                                    <span id="weight-gaming-val" class="font-semibold text-gray-300">7</span>
-                                </div>
-                                <input type="range" id="weight-gaming" min="1" max="10" value="7" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('weight-gaming-val').innerText=this.value">
-                            </div>
-
-                            <div>
-                                <div class="flex justify-between text-xs mb-1">
-                                    <span class="text-gray-300 flex items-center space-x-1">
-                                        <i data-lucide="battery-charging" class="w-3.5 h-3.5 text-indigo-400 mr-1"></i> Battery & Charging
-                                    </span>
-                                    <span id="weight-battery-val" class="font-semibold text-gray-300">8</span>
-                                </div>
-                                <input type="range" id="weight-battery" min="1" max="10" value="8" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('weight-battery-val').innerText=this.value">
-                            </div>
-
-                            <div>
-                                <div class="flex justify-between text-xs mb-1">
-                                    <span class="text-gray-300 flex items-center space-x-1">
-                                        <i data-lucide="tv" class="w-3.5 h-3.5 text-indigo-400 mr-1"></i> Display Quality
-                                    </span>
-                                    <span id="weight-display-val" class="font-semibold text-gray-300">7</span>
-                                </div>
-                                <input type="range" id="weight-display" min="1" max="10" value="7" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('weight-display-val').innerText=this.value">
-                            </div>
-
-                            <div>
-                                <div class="flex justify-between text-xs mb-1">
-                                    <span class="text-gray-300 flex items-center space-x-1">
-                                        <i data-lucide="palette" class="w-3.5 h-3.5 text-indigo-400 mr-1"></i> Design & Build
-                                    </span>
-                                    <span id="weight-design-val" class="font-semibold text-gray-300">6</span>
-                                </div>
-                                <input type="range" id="weight-design" min="1" max="10" value="6" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('weight-design-val').innerText=this.value">
-                            </div>
-
-                            <div>
-                                <div class="flex justify-between text-xs mb-1">
-                                    <span class="text-gray-300 flex items-center space-x-1">
-                                        <i data-lucide="layers" class="w-3.5 h-3.5 text-indigo-400 mr-1"></i> Software & Updates
-                                    </span>
-                                    <span id="weight-software-val" class="font-semibold text-gray-300">8</span>
-                                </div>
-                                <input type="range" id="weight-software" min="1" max="10" value="8" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('weight-software-val').innerText=this.value">
-                            </div>
-
-                            <div>
-                                <div class="flex justify-between text-xs mb-1">
-                                    <span class="text-gray-300 flex items-center space-x-1">
-                                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-indigo-400 mr-1"></i> Durability & IP Rating
-                                    </span>
-                                    <span id="weight-durability-val" class="font-semibold text-gray-300">6</span>
-                                </div>
-                                <input type="range" id="weight-durability" min="1" max="10" value="6" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('weight-durability-val').innerText=this.value">
-                            </div>
-
-                            <div>
-                                <div class="flex justify-between text-xs mb-1">
-                                    <span class="text-gray-300 flex items-center space-x-1">
-                                        <i data-lucide="badge-percent" class="w-3.5 h-3.5 text-indigo-400 mr-1"></i> Value for Money
-                                    </span>
-                                    <span id="weight-vfm-val" class="font-semibold text-gray-300">9</span>
-                                </div>
-                                <input type="range" id="weight-vfm" min="1" max="10" value="9" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer" oninput="document.getElementById('weight-vfm-val').innerText=this.value">
-                            </div>
-
-                        </div>
-
-                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center space-x-2">
-                            <i data-lucide="sparkles" class="w-4 h-4"></i>
-                            <span>Find Best Matches</span>
-                        </button>
-                    </form>
-                </div>
-
-                <div class="lg:col-span-8 space-y-6">
-                    
-                    <div id="top-match-hero" class="relative overflow-hidden glass-panel rounded-2xl p-6 border border-indigo-500/40 bg-gradient-to-br from-indigo-950/40 via-dark-card to-dark-bg">
-                        </div>
-
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
-                        <div>
-                            <h3 class="text-lg font-bold text-white flex items-center space-x-2">
-                                <span>Recommended Rankings</span>
-                                <span id="recommendation-count-badge" class="bg-indigo-900/60 text-indigo-300 border border-indigo-700/50 text-xs px-2.5 py-0.5 rounded-full font-semibold">0 Matches</span>
-                            </h3>
-                            <p class="text-xs text-gray-400">Scored using custom weighted suitability algorithms.</p>
-                        </div>
-                        
-                        <div class="flex items-center space-x-2">
-                            <label class="text-xs text-gray-400">Sort By:</label>
-                            <select id="rec-sort-by" onchange="calculateRecommendations()" class="bg-dark-card border border-gray-700 text-xs rounded-lg px-2.5 py-1.5 text-gray-300 focus:outline-none">
-                                <option value="score">Suitability Score</option>
-                                <option value="price_low">Price: Low to High</option>
-                                <option value="price_high">Price: High to Low</option>
-                                <option value="popularity">Popularity</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div id="recommendations-list" class="space-y-4">
-                        </div>
-                </div>
-
-            </div>
-        </div>
-
-        <div id="tab-catalog" class="hidden space-y-6">
-            <div class="glass-panel rounded-2xl p-5 border border-gray-800 space-y-4">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div class="relative flex-grow">
-                        <i data-lucide="search" class="w-5 h-5 absolute left-3.5 top-3 text-gray-400"></i>
-                        <input type="text" id="catalog-search" placeholder="Search phone name, processor, or specs..." oninput="filterCatalog()" class="w-full bg-dark-card border border-gray-700 rounded-xl pl-11 pr-4 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-indigo-500">
-                    </div>
-
-                    <div class="flex flex-wrap items-center gap-3">
-                        <select id="catalog-filter-brand" onchange="filterCatalog()" class="bg-dark-card border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none">
-                            <option value="All">All Brands</option>
-                        </select>
-
-                        <select id="catalog-filter-budget" onchange="filterCatalog()" class="bg-dark-card border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none">
-                            <option value="All">All Budgets</option>
-                            <option value="under15k">Under ₹15,000</option>
-                            <option value="15k-30k">₹15,000 - ₹30,000</option>
-                            <option value="30k-50k">₹30,000 - ₹50,000</option>
-                            <option value="50k-80k">₹50,000 - ₹80,000</option>
-                            <option value="above80k">Above ₹80,000</option>
-                        </select>
-
-                        <select id="catalog-filter-status" onchange="filterCatalog()" class="bg-dark-card border border-gray-700 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none">
-                            <option value="All">All Models</option>
-                            <option value="Released">Released / Confirmed</option>
-                            <option value="Uncertain">Uncertain / Unreleased</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div id="catalog-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                </div>
-        </div>
-
-        <div id="tab-compare" class="hidden space-y-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h2 class="text-2xl font-bold text-white">Device Comparison</h2>
-                    <p class="text-sm text-gray-400">Compare specs and benchmark scores head-to-head.</p>
-                </div>
-                <button onclick="clearComparison()" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs rounded-lg transition-colors">Clear Selection</button>
-            </div>
-
-            <div id="compare-container" class="overflow-x-auto custom-scrollbar">
-                </div>
-        </div>
-
-    </main>
-
-    <div id="phone-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="glass-panel border border-gray-700 rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar p-6 relative">
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2">
-                <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
-            <div id="modal-content">
-                </div>
-        </div>
+      </div>
     </div>
 
-    <footer class="border-t border-gray-800 py-6 glass-panel mt-12 text-center text-xs text-gray-500">
-        <div class="max-w-7xl mx-auto px-4">
-            <p>PhonePilot AI © 2026. Data updated with standard international and Indian market specs.</p>
-            <p class="mt-1 text-gray-600">Note: Dynamic live API adapter ready. Specs are marked where region variants apply.</p>
+    <!-- CATALOG VIEW -->
+    <div id="catalog-view" class="view-container">
+      <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+        <input type="text" class="search-input" id="search-bar" placeholder="Search by model, chip, or brand..." style="flex: 1; min-width: 250px;" oninput="renderCatalog()">
+      </div>
+      <div class="phones-grid" id="catalog-grid"></div>
+    </div>
+
+    <!-- COMPARE VIEW -->
+    <div id="compare-view" class="view-container">
+      <div class="section-title">
+        <i class="fa-solid fa-code-compare" style="color: var(--primary-accent);"></i>
+        <span>Side-by-Side Comparison</span>
+      </div>
+      <div id="compare-content"></div>
+    </div>
+  </main>
+
+  <script>
+    // -------------------------------------------------------------
+    // VERIFIED SMARTPHONE DATABASE (100% Real Smartphone Models)
+    // -------------------------------------------------------------
+    const phoneDatabase = [
+      // APPLE
+      { id: "app-16pm", brand: "Apple", name: "iPhone 16 Pro Max", price: 144900, processor: "Apple A18 Pro", display: '6.9" Super Retina XDR OLED 120Hz', camera: "48MP Main + 48MP UW + 12MP 5x Periscope", battery: "4685 mAh", scores: { cam: 10, perf: 10, bat: 9, disp: 10 } },
+      { id: "app-16p", brand: "Apple", name: "iPhone 16 Pro", price: 119900, processor: "Apple A18 Pro", display: '6.3" Super Retina XDR OLED 120Hz', camera: "48MP Main + 48MP UW + 12MP 5x Telephoto", battery: "3582 mAh", scores: { cam: 10, perf: 10, bat: 7, disp: 10 } },
+      { id: "app-16", brand: "Apple", name: "iPhone 16", price: 79900, processor: "Apple A18", display: '6.1" Super Retina XDR OLED 60Hz', camera: "48MP Main + 12MP Ultra-Wide", battery: "3561 mAh", scores: { cam: 8, perf: 9, bat: 7, disp: 8 } },
+      { id: "app-16plus", brand: "Apple", name: "iPhone 16 Plus", price: 89900, processor: "Apple A18", display: '6.7" Super Retina XDR OLED 60Hz', camera: "48MP Main + 12MP Ultra-Wide", battery: "4674 mAh", scores: { cam: 8, perf: 9, bat: 9, disp: 8 } },
+      { id: "app-15pm", brand: "Apple", name: "iPhone 15 Pro Max", price: 134900, processor: "Apple A17 Pro", display: '6.7" Super Retina XDR OLED 120Hz', camera: "48MP Main + 12MP UW + 12MP 5x Telephoto", battery: "4422 mAh", scores: { cam: 9, perf: 9, bat: 8, disp: 9 } },
+      { id: "app-15", brand: "Apple", name: "iPhone 15", price: 65900, processor: "Apple A16 Bionic", display: '6.1" Super Retina XDR OLED 60Hz', camera: "48MP Main + 12MP Ultra-Wide", battery: "3349 mAh", scores: { cam: 8, perf: 8, bat: 7, disp: 8 } },
+      { id: "app-14", brand: "Apple", name: "iPhone 14", price: 56900, processor: "Apple A15 Bionic", display: '6.1" Super Retina XDR OLED 60Hz', camera: "12MP Main + 12MP Ultra-Wide", battery: "3279 mAh", scores: { cam: 7, perf: 7, bat: 6, disp: 7 } },
+      { id: "app-13", brand: "Apple", name: "iPhone 13", price: 48900, processor: "Apple A15 Bionic", display: '6.1" Super Retina XDR OLED 60Hz', camera: "12MP Main + 12MP Ultra-Wide", battery: "3240 mAh", scores: { cam: 7, perf: 7, bat: 6, disp: 7 } },
+
+      // SAMSUNG
+      { id: "sam-s25u", brand: "Samsung", name: "Galaxy S25 Ultra", price: 129999, processor: "Snapdragon 8 Elite", display: '6.8" Dynamic AMOLED 2X 120Hz', camera: "200MP + 50MP UW + 50MP 5x + 10MP 3x", battery: "5000 mAh", scores: { cam: 10, perf: 10, bat: 9, disp: 10 } },
+      { id: "sam-s25p", brand: "Samsung", name: "Galaxy S25+", price: 99999, processor: "Snapdragon 8 Elite", display: '6.7" Dynamic AMOLED 2X 120Hz', camera: "50MP Main + 12MP UW + 10MP 3x Telephoto", battery: "4900 mAh", scores: { cam: 9, perf: 10, bat: 8, disp: 9 } },
+      { id: "sam-s25", brand: "Samsung", name: "Galaxy S25", price: 79999, processor: "Snapdragon 8 Elite", display: '6.2" Dynamic AMOLED 2X 120Hz', camera: "50MP Main + 12MP UW + 10MP 3x Telephoto", battery: "4000 mAh", scores: { cam: 8, perf: 10, bat: 7, disp: 9 } },
+      { id: "sam-s24u", brand: "Samsung", name: "Galaxy S24 Ultra", price: 109999, processor: "Snapdragon 8 Gen 3", display: '6.8" Dynamic AMOLED 2X 120Hz', camera: "200MP + 12MP UW + 50MP 5x + 10MP 3x", battery: "5000 mAh", scores: { cam: 9, perf: 9, bat: 9, disp: 10 } },
+      { id: "sam-s24fe", brand: "Samsung", name: "Galaxy S24 FE", price: 59999, processor: "Exynos 2400e", display: '6.7" Dynamic AMOLED 2X 120Hz', camera: "50MP Main + 12MP UW + 8MP 3x Telephoto", battery: "4700 mAh", scores: { cam: 8, perf: 8, bat: 7, disp: 8 } },
+      { id: "sam-zfold6", brand: "Samsung", name: "Galaxy Z Fold 6", price: 164999, processor: "Snapdragon 8 Gen 3", display: '7.6" Dynamic AMOLED 2X 120Hz Foldable', camera: "50MP Main + 12MP UW + 10MP 3x Telephoto", battery: "4400 mAh", scores: { cam: 8, perf: 9, bat: 7, disp: 10 } },
+      { id: "sam-zflip6", brand: "Samsung", name: "Galaxy Z Flip 6", price: 109999, processor: "Snapdragon 8 Gen 3", display: '6.7" Dynamic AMOLED 2X 120Hz Flip', camera: "50MP Main + 12MP Ultra-Wide", battery: "4000 mAh", scores: { cam: 8, perf: 9, bat: 7, disp: 9 } },
+      { id: "sam-a55", brand: "Samsung", name: "Galaxy A55 5G", price: 38999, processor: "Exynos 1480", display: '6.6" Super AMOLED 120Hz', camera: "50MP Main + 12MP UW + 5MP Macro", battery: "5000 mAh", scores: { cam: 7, perf: 7, bat: 8, disp: 8 } },
+      { id: "sam-a35", brand: "Samsung", name: "Galaxy A35 5G", price: 27999, processor: "Exynos 1380", display: '6.6" Super AMOLED 120Hz', camera: "50MP Main + 8MP UW + 5MP Macro", battery: "5000 mAh", scores: { cam: 6, perf: 6, bat: 8, disp: 8 } },
+      { id: "sam-m55", brand: "Samsung", name: "Galaxy M55 5G", price: 24999, processor: "Snapdragon 7 Gen 1", display: '6.7" Super AMOLED+ 120Hz', camera: "50MP OIS + 8MP UW + 2MP Macro", battery: "5000 mAh", scores: { cam: 6, perf: 6, bat: 8, disp: 8 } },
+      { id: "sam-m35", brand: "Samsung", name: "Galaxy M35 5G", price: 19999, processor: "Exynos 1380", display: '6.6" Super AMOLED 120Hz', camera: "50MP OIS + 8MP UW + 2MP Macro", battery: "6000 mAh", scores: { cam: 6, perf: 6, bat: 10, disp: 7 } },
+      { id: "sam-m15", brand: "Samsung", name: "Galaxy M15 5G", price: 12999, processor: "MediaTek Dimensity 6100+", display: '6.5" Super AMOLED 90Hz', camera: "50MP Main + 5MP UW + 2MP Macro", battery: "6000 mAh", scores: { cam: 5, perf: 5, bat: 10, disp: 7 } },
+
+      // ONEPLUS
+      { id: "op-13", brand: "OnePlus", name: "OnePlus 13", price: 69999, processor: "Snapdragon 8 Elite", display: '6.82" 2K Quad-Curved AMOLED 120Hz', camera: "50MP Sony LYT-808 + 50MP UW + 50MP 3x Periscope", battery: "6000 mAh", scores: { cam: 9, perf: 10, bat: 10, disp: 10 } },
+      { id: "op-13r", brand: "OnePlus", name: "OnePlus 13R", price: 42999, processor: "Snapdragon 8 Gen 3", display: '6.78" 1.5K AMOLED 120Hz', camera: "50MP Main + 8MP UW + 50MP Telephoto", battery: "6000 mAh", scores: { cam: 8, perf: 9, bat: 10, disp: 9 } },
+      { id: "op-12", brand: "OnePlus", name: "OnePlus 12", price: 64999, processor: "Snapdragon 8 Gen 3", display: '6.82" 2K AMOLED 120Hz', camera: "50MP Main + 48MP UW + 64MP 3x Periscope", battery: "5400 mAh", scores: { cam: 9, perf: 9, bat: 9, disp: 9 } },
+      { id: "op-12r", brand: "OnePlus", name: "OnePlus 12R", price: 37999, processor: "Snapdragon 8 Gen 2", display: '6.78" 1.5K AMOLED 120Hz', camera: "50MP Main + 8MP UW + 2MP Macro", battery: "5500 mAh", scores: { cam: 7, perf: 8, bat: 9, disp: 9 } },
+      { id: "op-nord4", brand: "OnePlus", name: "OnePlus Nord 4", price: 29999, processor: "Snapdragon 7+ Gen 3", display: '6.74" 1.5K AMOLED 120Hz', camera: "50MP Main + 8MP Ultra-Wide", battery: "5500 mAh", scores: { cam: 7, perf: 8, bat: 9, disp: 8 } },
+      { id: "op-nordce4", brand: "OnePlus", name: "OnePlus Nord CE 4", price: 24999, processor: "Snapdragon 7 Gen 3", display: '6.7" FHD+ AMOLED 120Hz', camera: "50MP Main + 8MP Ultra-Wide", battery: "5500 mAh", scores: { cam: 6, perf: 7, bat: 9, disp: 7 } },
+      { id: "op-nordce4lite", brand: "OnePlus", name: "OnePlus Nord CE 4 Lite 5G", price: 19999, processor: "Snapdragon 695", display: '6.67" AMOLED 120Hz', camera: "50MP Main + 2MP Depth", battery: "5500 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 7 } },
+      { id: "op-open", brand: "OnePlus", name: "OnePlus Open", price: 139999, processor: "Snapdragon 8 Gen 2", display: '7.82" Fluid AMOLED 120Hz Foldable', camera: "48MP Main + 48MP UW + 64MP 3x Telephoto", battery: "4805 mAh", scores: { cam: 9, perf: 9, bat: 7, disp: 9 } },
+
+      // XIAOMI / POCO / REDMI
+      { id: "xi-15pro", brand: "Xiaomi", name: "Xiaomi 15 Pro", price: 79999, processor: "Snapdragon 8 Elite", display: '6.73" 2K OLED 120Hz', camera: "50MP Leica Main + 50MP UW + 50MP Periscope", battery: "6100 mAh", scores: { cam: 10, perf: 10, bat: 10, disp: 10 } },
+      { id: "xi-14ultra", brand: "Xiaomi", name: "Xiaomi 14 Ultra", price: 99999, processor: "Snapdragon 8 Gen 3", display: '6.73" 2K LTPO AMOLED 120Hz', camera: "50MP Quad Camera with Leica Optics", battery: "5000 mAh", scores: { cam: 10, perf: 9, bat: 8, disp: 10 } },
+      { id: "xi-14civi", brand: "Xiaomi", name: "Xiaomi 14 Civi", price: 39999, processor: "Snapdragon 8s Gen 3", display: '6.55" 1.5K OLED 120Hz', camera: "50MP Leica Main + 50MP Tele + 12MP UW", battery: "4700 mAh", scores: { cam: 9, perf: 8, bat: 7, disp: 9 } },
+      { id: "poc-f6pro", brand: "Xiaomi", name: "Poco F6 Pro", price: 34999, processor: "Snapdragon 8 Gen 2", display: '6.67" 2K AMOLED 120Hz', camera: "50MP Main + 8MP UW + 2MP Macro", battery: "5000 mAh", scores: { cam: 7, perf: 9, bat: 8, disp: 8 } },
+      { id: "poc-f6", brand: "Xiaomi", name: "Poco F6 5G", price: 27999, processor: "Snapdragon 8s Gen 3", display: '6.67" 1.5K AMOLED 120Hz', camera: "50MP Main + 8MP Ultra-Wide", battery: "5000 mAh", scores: { cam: 7, perf: 9, bat: 8, disp: 8 } },
+      { id: "poc-x6pro", brand: "Xiaomi", name: "Poco X6 Pro 5G", price: 23999, processor: "MediaTek Dimensity 8300 Ultra", display: '6.67" 1.5K AMOLED 120Hz', camera: "64MP Main + 8MP UW + 2MP Macro", battery: "5000 mAh", scores: { cam: 6, perf: 8, bat: 8, disp: 8 } },
+      { id: "red-note14pro+", brand: "Xiaomi", name: "Redmi Note 14 Pro+ 5G", price: 30999, processor: "Snapdragon 7s Gen 3", display: '6.67" 1.5K Curved AMOLED 120Hz', camera: "50MP Main + 50MP Telephoto + 8MP UW", battery: "6200 mAh", scores: { cam: 8, perf: 7, bat: 10, disp: 9 } },
+      { id: "red-note14pro", brand: "Xiaomi", name: "Redmi Note 14 Pro 5G", price: 24999, processor: "MediaTek Dimensity 7300 Ultra", display: '6.67" 1.5K Curved AMOLED 120Hz', camera: "50MP Main + 8MP UW + 2MP Macro", battery: "5500 mAh", scores: { cam: 7, perf: 7, bat: 9, disp: 8 } },
+      { id: "red-13c", brand: "Xiaomi", name: "Redmi 13C 5G", price: 9999, processor: "MediaTek Dimensity 6100+", display: '6.74" HD+ 90Hz LCD', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 4, perf: 4, bat: 7, disp: 5 } },
+
+      // VIVO & iQOO
+      { id: "viv-x200p", brand: "Vivo", name: "Vivo X200 Pro", price: 94999, processor: "MediaTek Dimensity 9400", display: '6.78" Quad-Curved AMOLED 120Hz', camera: "50MP Zeiss Main + 200MP Zeiss Periscope + 50MP UW", battery: "6000 mAh", scores: { cam: 10, perf: 10, bat: 10, disp: 10 } },
+      { id: "viv-x200", brand: "Vivo", name: "Vivo X200", price: 65999, processor: "MediaTek Dimensity 9400", display: '6.67" AMOLED 120Hz', camera: "50MP Zeiss Main + 50MP Telephoto + 50MP UW", battery: "5800 mAh", scores: { cam: 9, perf: 10, bat: 9, disp: 9 } },
+      { id: "viv-v40p", brand: "Vivo", name: "Vivo V40 Pro", price: 49999, processor: "MediaTek Dimensity 9200+", display: '6.78" 1.5K Curved AMOLED 120Hz', camera: "50MP Zeiss Main + 50MP Zeiss Tele + 50MP UW", battery: "5500 mAh", scores: { cam: 9, perf: 8, bat: 9, disp: 9 } },
+      { id: "viv-v40", brand: "Vivo", name: "Vivo V40 5G", price: 34999, processor: "Snapdragon 7 Gen 3", display: '6.78" 1.5K Curved AMOLED 120Hz', camera: "50MP Zeiss Main + 50MP Zeiss UW", battery: "5500 mAh", scores: { cam: 8, perf: 7, bat: 9, disp: 8 } },
+      { id: "iq-13", brand: "iQOO", name: "iQOO 13", price: 54999, processor: "Snapdragon 8 Elite", display: '6.82" 2K 144Hz AMOLED', camera: "50MP Main + 50MP UW + 50MP Telephoto", battery: "6000 mAh", scores: { cam: 9, perf: 10, bat: 10, disp: 10 } },
+      { id: "iq-neo9pro", brand: "iQOO", name: "iQOO Neo 9 Pro", price: 35999, processor: "Snapdragon 8 Gen 2", display: '6.78" 1.5K 144Hz AMOLED', camera: "50MP Sony IMX920 + 8MP UW", battery: "5160 mAh", scores: { cam: 8, perf: 9, bat: 8, disp: 9 } },
+      { id: "iq-z9s-pro", brand: "iQOO", name: "iQOO Z9s Pro 5G", price: 24999, processor: "Snapdragon 7 Gen 3", display: '6.77" Curved AMOLED 120Hz', camera: "50MP Sony IMX882 OIS + 8MP UW", battery: "5500 mAh", scores: { cam: 7, perf: 7, bat: 9, disp: 8 } },
+      { id: "iq-z9x", brand: "iQOO", name: "iQOO Z9x 5G", price: 12999, processor: "Snapdragon 6 Gen 1", display: '6.72" FHD+ 120Hz LCD', camera: "50MP Main + 2MP Depth", battery: "6000 mAh", scores: { cam: 5, perf: 6, bat: 10, disp: 6 } },
+
+      // REALME
+      { id: "rm-gt7pro", brand: "Realme", name: "Realme GT 7 Pro", price: 59999, processor: "Snapdragon 8 Elite", display: '6.78" Eco2 OLED Plus 120Hz', camera: "50MP Main + 50MP 3x Periscope + 8MP UW", battery: "6500 mAh", scores: { cam: 9, perf: 10, bat: 10, disp: 10 } },
+      { id: "rm-gt6", brand: "Realme", name: "Realme GT 6", price: 40999, processor: "Snapdragon 8s Gen 3", display: '6.78" 1.5K LTPO AMOLED 120Hz', camera: "50MP Sony LYT-808 + 50MP Tele + 8MP UW", battery: "5500 mAh", scores: { cam: 8, perf: 9, bat: 9, disp: 9 } },
+      { id: "rm-gt6t", brand: "Realme", name: "Realme GT 6T", price: 30999, processor: "Snapdragon 7+ Gen 3", display: '6.78" 1.5K LTPO AMOLED 120Hz', camera: "50MP Sony LYT-600 + 8MP UW", battery: "5500 mAh", scores: { cam: 7, perf: 8, bat: 9, disp: 9 } },
+      { id: "rm-13pro+", brand: "Realme", name: "Realme 13 Pro+ 5G", price: 32999, processor: "Snapdragon 7s Gen 2", display: '6.7" Curved AMOLED 120Hz', camera: "50MP Sony LYT-701 + 50MP Periscope + 8MP UW", battery: "5200 mAh", scores: { cam: 9, perf: 6, bat: 8, disp: 8 } },
+      { id: "rm-p2pro", brand: "Realme", name: "Realme P2 Pro 5G", price: 21999, processor: "Snapdragon 7s Gen 2", display: '6.7" Curved AMOLED 120Hz', camera: "50MP Sony LYT-600 OIS + 8MP UW", battery: "5200 mAh", scores: { cam: 7, perf: 7, bat: 8, disp: 8 } },
+      { id: "rm-13plus", brand: "Realme", name: "Realme 13+ 5G", price: 22999, processor: "MediaTek Dimensity 7300 Energy", display: '6.67" OLED 120Hz', camera: "50MP Sony LYT-600 Main", battery: "5000 mAh", scores: { cam: 6, perf: 7, bat: 8, disp: 7 } },
+      { id: "rm-12x", brand: "Realme", name: "Realme 12x 5G", price: 11999, processor: "MediaTek Dimensity 6100+", display: '6.72" FHD+ 120Hz LCD', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 6 } },
+
+      // MOTOROLA
+      { id: "mot-razr50u", brand: "Motorola", name: "Razr 50 Ultra", price: 99999, processor: "Snapdragon 8s Gen 3", display: '6.9" FHD+ pOLED 165Hz Foldable', camera: "50MP Main + 50MP 2x Telephoto", battery: "4000 mAh", scores: { cam: 8, perf: 8, bat: 6, disp: 10 } },
+      { id: "mot-edge50ultra", brand: "Motorola", name: "Edge 50 Ultra", price: 59999, processor: "Snapdragon 8s Gen 3", display: '6.7" 1.5K pOLED 144Hz', camera: "50MP Main + 50MP UW + 64MP 3x Periscope", battery: "4500 mAh", scores: { cam: 9, perf: 8, bat: 7, disp: 9 } },
+      { id: "mot-edge50pro", brand: "Motorola", name: "Edge 50 Pro", price: 31999, processor: "Snapdragon 7 Gen 3", display: '6.7" 1.5K pOLED 144Hz', camera: "50MP Main + 13MP UW + 10MP 3x Telephoto", battery: "4500 mAh", scores: { cam: 8, perf: 7, bat: 7, disp: 9 } },
+      { id: "mot-edge50neo", brand: "Motorola", name: "Edge 50 Neo", price: 23999, processor: "MediaTek Dimensity 7300", display: '6.4" 1.5K LTPO pOLED 120Hz', camera: "50MP Sony LYT-700C + 13MP UW + 10MP Tele", battery: "4310 mAh", scores: { cam: 8, perf: 6, bat: 6, disp: 8 } },
+      { id: "mot-edge50fusion", brand: "Motorola", name: "Edge 50 Fusion", price: 22999, processor: "Snapdragon 7s Gen 2", display: '6.7" FHD+ pOLED 144Hz', camera: "50MP Sony LYT-700C + 13MP UW", battery: "5000 mAh", scores: { cam: 7, perf: 6, bat: 8, disp: 8 } },
+      { id: "mot-g85", brand: "Motorola", name: "Moto G85 5G", price: 17999, processor: "Snapdragon 6s Gen 3", display: '6.67" 3D Curved pOLED 120Hz', camera: "50MP Sony LYT-600 + 8MP UW", battery: "5000 mAh", scores: { cam: 6, perf: 6, bat: 8, disp: 8 } },
+      { id: "mot-g64", brand: "Motorola", name: "Moto G64 5G", price: 13999, processor: "MediaTek Dimensity 7025", display: '6.5" FHD+ 120Hz LCD', camera: "50MP OIS + 8MP UW", battery: "6000 mAh", scores: { cam: 6, perf: 6, bat: 10, disp: 6 } },
+      { id: "mot-g45", brand: "Motorola", name: "Moto G45 5G", price: 10999, processor: "Snapdragon 6s Gen 3", display: '6.5" HD+ 120Hz LCD', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 5 } },
+
+      // GOOGLE & NOTHING
+      { id: "goog-p9pro-xl", brand: "Google", name: "Pixel 9 Pro XL", price: 124999, processor: "Google Tensor G4", display: '6.8" Super Actua OLED 120Hz', camera: "50MP Main + 48MP UW + 48MP 5x Telephoto", battery: "5060 mAh", scores: { cam: 10, perf: 8, bat: 8, disp: 10 } },
+      { id: "goog-p9pro", brand: "Google", name: "Pixel 9 Pro", price: 109999, processor: "Google Tensor G4", display: '6.3" Super Actua OLED 120Hz', camera: "50MP Main + 48MP UW + 48MP 5x Telephoto", battery: "4700 mAh", scores: { cam: 10, perf: 8, bat: 7, disp: 10 } },
+      { id: "goog-p9", brand: "Google", name: "Pixel 9", price: 79999, processor: "Google Tensor G4", display: '6.3" Actua OLED 120Hz', camera: "50MP Main + 48MP Ultra-Wide", battery: "4700 mAh", scores: { cam: 9, perf: 8, bat: 7, disp: 9 } },
+      { id: "goog-p8a", brand: "Google", name: "Pixel 8a", price: 52999, processor: "Google Tensor G3", display: '6.1" OLED 120Hz', camera: "64MP Main + 13MP Ultra-Wide", battery: "4492 mAh", scores: { cam: 8, perf: 7, bat: 6, disp: 8 } },
+      { id: "not-2", brand: "Nothing", name: "Phone (2)", price: 39999, processor: "Snapdragon 8+ Gen 1", display: '6.7" LTPO OLED 120Hz', camera: "50MP Sony IMX890 + 50MP UW", battery: "4700 mAh", scores: { cam: 8, perf: 8, bat: 7, disp: 9 } },
+      { id: "not-2a-plus", brand: "Nothing", name: "Phone (2a) Plus", price: 27999, processor: "MediaTek Dimensity 7350 Pro", display: '6.7" AMOLED 120Hz', camera: "50MP Main + 50MP UW + 50MP Front", battery: "5000 mAh", scores: { cam: 7, perf: 7, bat: 8, disp: 8 } },
+      { id: "not-2a", brand: "Nothing", name: "Phone (2a)", price: 23999, processor: "MediaTek Dimensity 7200 Pro", display: '6.7" AMOLED 120Hz', camera: "50MP Main + 50MP Ultra-Wide", battery: "5000 mAh", scores: { cam: 7, perf: 7, bat: 8, disp: 8 } },
+      { id: "cmf-1", brand: "Nothing", name: "CMF Phone 1", price: 15999, processor: "MediaTek Dimensity 7300", display: '6.67" Super AMOLED 120Hz', camera: "50MP Sony Main Sensor", battery: "5000 mAh", scores: { cam: 6, perf: 7, bat: 8, disp: 8 } }
+    ];
+
+    // State Management
+    let compareList = [];
+
+    // Navigation Switcher
+    function switchTab(tabId) {
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.view-container').forEach(view => view.classList.remove('active'));
+
+      event.currentTarget.classList.add('active');
+      document.getElementById(`${tabId}-view`).classList.add('active');
+
+      if (tabId === 'catalog') renderCatalog();
+      if (tabId === 'compare') renderComparison();
+    }
+
+    // Recommendation Algorithm
+    function calculateSuitability(phone) {
+      const wCam = parseInt(document.getElementById('weight-cam').value);
+      const wPerf = parseInt(document.getElementById('weight-perf').value);
+      const wBat = parseInt(document.getElementById('weight-bat').value);
+      const wDisp = parseInt(document.getElementById('weight-disp').value);
+
+      const totalWeight = wCam + wPerf + wBat + wDisp;
+      
+      const weightedScore = (
+        (phone.scores.cam * wCam) +
+        (phone.scores.perf * wPerf) +
+        (phone.scores.bat * wBat) +
+        (phone.scores.disp * wDisp)
+      );
+
+      // Scale to 0-100%
+      return Math.round((weightedScore / (totalWeight * 10)) * 100);
+    }
+
+    function updateFilters() {
+      // Update UI slider readouts
+      const budget = parseInt(document.getElementById('budget-slider').value);
+      document.getElementById('budget-val').innerText = `₹${budget.toLocaleString('en-IN')}`;
+      
+      document.getElementById('weight-cam-val').innerText = document.getElementById('weight-cam').value;
+      document.getElementById('weight-perf-val').innerText = document.getElementById('weight-perf').value;
+      document.getElementById('weight-bat-val').innerText = document.getElementById('weight-bat').value;
+      document.getElementById('weight-disp-val').innerText = document.getElementById('weight-disp').value;
+
+      renderRecommendations();
+    }
+
+    function resetFilters() {
+      document.getElementById('budget-slider').value = 150000;
+      document.getElementById('brand-select').value = 'ALL';
+      document.getElementById('weight-cam').value = 5;
+      document.getElementById('weight-perf').value = 5;
+      document.getElementById('weight-bat').value = 5;
+      document.getElementById('weight-disp').value = 5;
+      updateFilters();
+    }
+
+    function renderRecommendations() {
+      const budget = parseInt(document.getElementById('budget-slider').value);
+      const selectedBrand = document.getElementById('brand-select').value;
+      const grid = document.getElementById('recommendations-grid');
+
+      let filtered = phoneDatabase.filter(phone => {
+        const matchesBudget = phone.price <= budget;
+        const matchesBrand = selectedBrand === 'ALL' || phone.brand === selectedBrand;
+        return matchesBudget && matchesBrand;
+      });
+
+      // Sort by suitability score
+      filtered.forEach(phone => phone.currentMatch = calculateSuitability(phone));
+      filtered.sort((a, b) => b.currentMatch - a.currentMatch);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1/-1;">
+            <i class="fa-solid fa-filter-circle-xmark"></i>
+            <h3>No devices match your criteria</h3>
+            <p>Try increasing your budget ceiling or resetting brand filters.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(phone => createPhoneCard(phone, true)).join('');
+    }
+
+    function renderCatalog() {
+      const search = document.getElementById('search-bar').value.toLowerCase();
+      const grid = document.getElementById('catalog-grid');
+
+      let filtered = phoneDatabase.filter(p => 
+        p.name.toLowerCase().includes(search) || 
+        p.brand.toLowerCase().includes(search) ||
+        p.processor.toLowerCase().includes(search)
+      );
+
+      grid.innerHTML = filtered.map(phone => createPhoneCard(phone, false)).join('');
+    }
+
+    function createPhoneCard(phone, showMatchBadge) {
+      const isCompared = compareList.some(item => item.id === phone.id);
+      return `
+        <div class="phone-card">
+          ${showMatchBadge ? `<div class="suitability-badge">${phone.currentMatch}% Match</div>` : ''}
+          <div>
+            <span class="phone-brand">${phone.brand}</span>
+            <h3 class="phone-name">${phone.name}</h3>
+            <div class="phone-price">₹${phone.price.toLocaleString('en-IN')}</div>
+            <ul class="specs-list">
+              <li><i class="fa-solid fa-microchip"></i> ${phone.processor}</li>
+              <li><i class="fa-solid fa-mobile-screen"></i> ${phone.display}</li>
+              <li><i class="fa-solid fa-camera"></i> ${phone.camera}</li>
+              <li><i class="fa-solid fa-battery-full"></i> ${phone.battery}</li>
+            </ul>
+          </div>
+          <div class="card-actions">
+            <button class="btn-action ${isCompared ? 'active' : ''}" onclick="toggleCompare('${phone.id}')">
+              <i class="fa-solid ${isCompared ? 'fa-check' : 'fa-plus'}"></i> ${isCompared ? 'Added' : 'Compare'}
+            </button>
+          </div>
         </div>
-    </footer>
+      `;
+    }
 
-    <script>
-        // -------------------------------------------------------------
-        // 1. DATA MODEL & VERIFIED CATALOG DATA (200+ SMARTPHONE MODELS)
-        // -------------------------------------------------------------
-        
-        // Dynamic generation function to generate systematic dataset verified for Indian & global markets
-        function generatePhoneCatalog() {
-            const brands = [
-                { name: "Apple", prefix: "iPhone", tierBase: 55000 },
-                { name: "Samsung", prefix: "Galaxy", tierBase: 12000 },
-                { name: "OnePlus", prefix: "", tierBase: 20000 },
-                { name: "Xiaomi", prefix: "Redmi / Xiaomi", tierBase: 9000 },
-                { name: "iQOO", prefix: "iQOO", tierBase: 14000 },
-                { name: "Realme", prefix: "Realme", tierBase: 10000 },
-                { name: "Nothing", prefix: "Nothing Phone", tierBase: 22000 },
-                { name: "Google", prefix: "Pixel", tierBase: 35000 },
-                { name: "Vivo", prefix: "Vivo", tierBase: 12000 },
-                { name: "Oppo", prefix: "Oppo", tierBase: 13000 },
-                { name: "Motorola", prefix: "Moto", tierBase: 10000 }
-            ];
-
-            const catalog = [];
-            let idCounter = 1;
-
-            // Verified Base Hand-curated Key Phones
-            const curatedPhones = [
-                { id: idCounter++, name: "Apple iPhone 16 Pro Max", brand: "Apple", price: 144900, camera: 98, performance: 99, gaming: 98, battery: 92, display: 97, design: 96, software: 98, durability: 96, vfm: 70, popularity: 99, verified: true, status: "Confirmed", specs: { chip: "A18 Pro", ram: "8GB", storage: "256GB", battery: "4685 mAh", mainCam: "48MP + 48MP + 12MP", display: "6.9\" OLED 120Hz" } },
-                { id: idCounter++, name: "Apple iPhone 16", brand: "Apple", price: 79900, camera: 90, performance: 94, gaming: 91, battery: 86, display: 88, design: 92, software: 98, durability: 92, vfm: 80, popularity: 97, verified: true, status: "Confirmed", specs: { chip: "A18", ram: "8GB", storage: "128GB", battery: "3561 mAh", mainCam: "48MP + 12MP", display: "6.1\" OLED 60Hz" } },
-                { id: idCounter++, name: "Apple iPhone 15", brand: "Apple", price: 65900, camera: 87, performance: 89, gaming: 86, battery: 82, display: 86, design: 90, software: 96, durability: 90, vfm: 84, popularity: 95, verified: true, status: "Confirmed", specs: { chip: "A16 Bionic", ram: "6GB", storage: "128GB", battery: "3349 mAh", mainCam: "48MP + 12MP", display: "6.1\" OLED 60Hz" } },
-                { id: idCounter++, name: "Samsung Galaxy S25 Ultra", brand: "Samsung", price: 129999, camera: 98, performance: 99, gaming: 98, battery: 94, display: 99, design: 95, software: 95, durability: 96, vfm: 74, popularity: 98, verified: true, status: "Confirmed", specs: { chip: "Snapdragon 8 Elite", ram: "12GB", storage: "256GB", battery: "5000 mAh", mainCam: "200MP + 50MP + 50MP + 10MP", display: "6.9\" Dynamic AMOLED 2X 120Hz" } },
-                { id: idCounter++, name: "Samsung Galaxy S24 FE", brand: "Samsung", price: 54999, camera: 86, performance: 88, gaming: 85, battery: 86, display: 90, design: 88, software: 94, durability: 88, vfm: 86, popularity: 90, verified: true, status: "Confirmed", specs: { chip: "Exynos 2400e", ram: "8GB", storage: "128GB", battery: "4700 mAh", mainCam: "50MP + 12MP + 8MP", display: "6.7\" Dynamic AMOLED 120Hz" } },
-                { id: idCounter++, name: "Samsung Galaxy A55 5G", brand: "Samsung", price: 38999, camera: 80, performance: 78, gaming: 75, battery: 89, display: 88, design: 86, software: 92, durability: 90, vfm: 82, popularity: 92, verified: true, status: "Confirmed", specs: { chip: "Exynos 1480", ram: "8GB", storage: "128GB", battery: "5000 mAh", mainCam: "50MP + 12MP + 5MP", display: "6.6\" Super AMOLED 120Hz" } },
-                { id: idCounter++, name: "OnePlus 13", brand: "OnePlus", price: 69999, camera: 92, performance: 98, gaming: 97, battery: 96, display: 97, design: 92, software: 90, durability: 90, vfm: 88, popularity: 96, verified: true, status: "Confirmed", specs: { chip: "Snapdragon 8 Elite", ram: "12GB", storage: "256GB", battery: "6000 mAh (100W)", mainCam: "50MP + 50MP + 50MP", display: "6.82\" 2K AMOLED 120Hz" } },
-                { id: idCounter++, name: "OnePlus 12R", brand: "OnePlus", price: 39999, camera: 78, performance: 92, gaming: 92, battery: 95, display: 92, design: 88, software: 89, durability: 84, vfm: 92, popularity: 94, verified: true, status: "Confirmed", specs: { chip: "Snapdragon 8 Gen 2", ram: "8GB", storage: "128GB", battery: "5500 mAh (100W)", mainCam: "50MP + 8MP + 2MP", display: "6.78\" AMOLED 120Hz" } },
-                { id: idCounter++, name: "OnePlus Nord 4", brand: "OnePlus", price: 29999, camera: 79, performance: 85, gaming: 84, battery: 93, display: 88, design: 92, software: 88, durability: 88, vfm: 91, popularity: 93, verified: true, status: "Confirmed", specs: { chip: "Snapdragon 7+ Gen 3", ram: "8GB", storage: "128GB", battery: "5500 mAh (100W)", mainCam: "50MP + 8MP", display: "6.74\" AMOLED 120Hz" } },
-                { id: idCounter++, name: "iQOO 13", brand: "iQOO", price: 54999, camera: 88, performance: 99, gaming: 99, battery: 96, display: 96, design: 88, software: 84, durability: 86, vfm: 93, popularity: 91, verified: true, status: "Confirmed", specs: { chip: "Snapdragon 8 Elite", ram: "12GB", storage: "256GB", battery: "6150 mAh (120W)", mainCam: "50MP + 50MP + 50MP", display: "6.82\" 2K AMOLED 144Hz" } },
-                { id: idCounter++, name: "iQOO Neo 9 Pro", brand: "iQOO", price: 34999, camera: 82, performance: 93, gaming: 94, battery: 90, display: 90, design: 84, software: 82, durability: 82, vfm: 94, popularity: 92, verified: true, status: "Confirmed", specs: { chip: "Snapdragon 8 Gen 2", ram: "8GB", storage: "128GB", battery: "5160 mAh (120W)", mainCam: "50MP + 8MP", display: "6.78\" AMOLED 144Hz" } },
-                { id: idCounter++, name: "iQOO Z9s Pro", brand: "iQOO", price: 24999, camera: 78, performance: 82, gaming: 81, battery: 92, display: 88, design: 85, software: 80, durability: 80, vfm: 92, popularity: 89, verified: true, status: "Confirmed", specs: { chip: "Snapdragon 7 Gen 3", ram: "8GB", storage: "128GB", battery: "5500 mAh (80W)", mainCam: "50MP + 8MP", display: "6.77\" Curved AMOLED 120Hz" } },
-                { id: idCounter++, name: "Google Pixel 9 Pro", brand: "Google", price: 109999, camera: 98, performance: 87, gaming: 80, battery: 85, display: 96, design: 94, software: 99, durability: 92, vfm: 72, popularity: 90, verified: true, status: "Confirmed", specs: { chip: "Tensor G4", ram: "16GB", storage: "128GB", battery: "4700 mAh", mainCam: "50MP + 48MP + 48MP", display: "6.3\" Super Actua OLED 120Hz" } },
-                { id: idCounter++, name: "Google Pixel 8a", brand: "Google", price: 52999, camera: 91, performance: 83, gaming: 76, battery: 80, display: 86, design: 84, software: 98, durability: 86, vfm: 81, popularity: 88, verified: true, status: "Confirmed", specs: { chip: "Tensor G3", ram: "8GB", storage: "128GB", battery: "4492 mAh", mainCam: "64MP + 13MP", display: "6.1\" OLED 120Hz" } },
-                { id: idCounter++, name: "Nothing Phone (2a) Plus", brand: "Nothing", price: 27999, camera: 80, performance: 81, gaming: 80, battery: 88, display: 88, design: 96, software: 94, durability: 82, vfm: 90, popularity: 93, verified: true, status: "Confirmed", specs: { chip: "Dimensity 7350 Pro", ram: "8GB", storage: "256GB", battery: "5000 mAh (50W)", mainCam: "50MP + 50MP", display: "6.7\" AMOLED 120Hz" } },
-                { id: idCounter++, name: "Xiaomi 14 Ultra", brand: "Xiaomi", price: 99999, camera: 99, performance: 96, gaming: 95, battery: 88, display: 97, design: 92, software: 82, durability: 90, vfm: 76, popularity: 87, verified: true, status: "Confirmed", specs: { chip: "Snapdragon 8 Gen 3", ram: "16GB", storage: "512GB", battery: "5000 mAh (90W)", mainCam: "50MP Quad Leica", display: "6.73\" WQHD+ AMOLED 120Hz" } },
-                { id: idCounter++, name: "Redmi Note 13 Pro+ 5G", brand: "Xiaomi", price: 29999, camera: 85, performance: 81, gaming: 79, battery: 88, display: 90, design: 89, software: 78, durability: 88, vfm: 89, popularity: 95, verified: true, status: "Confirmed", specs: { chip: "Dimensity 7200 Ultra", ram: "8GB", storage: "256GB", battery: "5000 mAh (120W)", mainCam: "200MP + 8MP + 2MP", display: "6.67\" Curved OLED 120Hz" } },
-                { id: idCounter++, name: "Realme GT 6", brand: "Realme", price: 40999, camera: 84, performance: 91, gaming: 90, battery: 94, display: 94, design: 87, software: 80, durability: 84, vfm: 91, popularity: 88, verified: true, status: "Confirmed", specs: { chip: "Snapdragon 7+ Gen 3", ram: "8GB", storage: "256GB", battery: "5500 mAh (120W)", mainCam: "50MP + 50MP + 8MP", display: "6.78\" LTPO AMOLED 120Hz" } },
-                { id: idCounter++, name: "Moto Edge 50 Pro", brand: "Motorola", price: 31999, camera: 84, performance: 80, gaming: 78, battery: 82, display: 93, design: 94, software: 93, durability: 88, vfm: 90, popularity: 91, verified: true, status: "Confirmed", specs: { chip: "Snapdragon 7 Gen 3", ram: "8GB", storage: "256GB", battery: "4500 mAh (125W)", mainCam: "50MP + 13MP + 10MP", display: "6.7\" pOLED 144Hz 1.5K" } },
-                { id: idCounter++, name: "Vivo X100 Pro", brand: "Vivo", price: 89999, camera: 99, performance: 95, gaming: 93, battery: 92, display: 95, design: 91, software: 82, durability: 88, vfm: 80, popularity: 89, verified: true, status: "Confirmed", specs: { chip: "Dimensity 9300", ram: "16GB", storage: "512GB", battery: "5400 mAh (100W)", mainCam: "50MP Zeiss 1-inch", display: "6.78\" LTPO AMOLED 120Hz" } },
-                // Model with explicit region / launch uncertainty flag
-                { id: idCounter++, name: "Nothing Phone (3) [Unverified / Upcoming]", brand: "Nothing", price: 45000, camera: 86, performance: 91, gaming: 89, battery: 88, display: 92, design: 98, software: 95, durability: 84, vfm: 85, popularity: 92, verified: false, status: "Uncertain Spec / Rumored 2026", specs: { chip: "Snapdragon 8s Gen 3 (Expected)", ram: "12GB", storage: "256GB", battery: "5000 mAh", mainCam: "50MP + 50MP", display: "6.7\" OLED 120Hz" } }
-            ];
-
-            catalog.push(...curatedPhones);
-
-            // Procedural Generator to hit 200+ models covering budget, mid-range, & flagship across India & global markets
-            const seriesMap = {
-                "Apple": ["iPhone 14", "iPhone 13", "iPhone SE 4", "iPhone 15 Pro", "iPhone 15 Plus", "iPhone 16 Plus"],
-                "Samsung": ["Galaxy A15", "Galaxy A25", "Galaxy A35", "Galaxy M35", "Galaxy M55", "Galaxy F55", "Galaxy S23", "Galaxy S23 FE", "Galaxy S24", "Galaxy S24 Ultra", "Galaxy Z Flip 6", "Galaxy Z Fold 6"],
-                "OnePlus": ["Nord CE 4", "Nord CE 4 Lite", "OnePlus 11R", "OnePlus 12", "OnePlus Open"],
-                "Xiaomi": ["Redmi 13C", "Redmi 13 5G", "Redmi Note 13 5G", "Redmi Note 13 Pro", "Xiaomi 14", "Xiaomi 14 Civi", "Poco X6 Neo", "Poco X6 Pro", "Poco F6 5G", "Poco M6 Pro"],
-                "iQOO": ["iQOO Z9x", "iQOO Z9", "iQOO Neo 7 Pro", "iQOO 12", "iQOO Z9 Lite"],
-                "Realme": ["Realme 12 5G", "Realme 12+ 5G", "Realme 13 Pro+", "Realme P1 5G", "Realme P1 Pro", "Realme C65", "Realme GT 6T"],
-                "Nothing": ["Nothing Phone (1)", "Nothing Phone (2)", "CMF Phone 1"],
-                "Google": ["Pixel 7a", "Pixel 8", "Pixel 8 Pro", "Pixel 9", "Pixel 9 Pro XL"],
-                "Vivo": ["Vivo T3x", "Vivo T3 5G", "Vivo T3 Ultra", "Vivo V30 Pro", "Vivo V40 Pro", "Vivo X100"],
-                "Oppo": ["Oppo Reno 11", "Oppo Reno 12 Pro", "Oppo F27 Pro+", "Oppo A3 Pro", "Oppo Find N3 Flip"],
-                "Motorola": ["Moto G34", "Moto G64", "Moto G85", "Moto Edge 50 Fusion", "Moto Edge 50 Ultra", "Moto Razr 50"]
-            };
-
-            const chips = ["Snapdragon 695", "Snapdragon 7s Gen 2", "Dimensity 7050", "Snapdragon 8s Gen 3", "Dimensity 8300 Ultra", "Exynos 1380", "Helio G99"];
-
-            Object.keys(seriesMap).forEach(brand => {
-                const models = seriesMap[brand];
-                models.forEach((mName, idx) => {
-                    const priceBase = 10000 + (idx * 5500) + Math.floor(Math.random() * 3000);
-                    const perfScore = Math.min(98, 60 + Math.floor(priceBase / 1800));
-                    const camScore = Math.min(98, 58 + Math.floor(priceBase / 1900));
-                    const battScore = 75 + Math.floor(Math.random() * 22);
-
-                    catalog.push({
-                        id: idCounter++,
-                        name: `${mName} ${idx % 2 === 0 ? '(5G)' : ''}`,
-                        brand: brand,
-                        price: priceBase,
-                        camera: camScore,
-                        performance: perfScore,
-                        gaming: Math.max(50, perfScore - 3 + Math.floor(Math.random() * 6)),
-                        battery: battScore,
-                        display: 70 + Math.floor(Math.random() * 25),
-                        design: 70 + Math.floor(Math.random() * 25),
-                        software: brand === "Apple" || brand === "Google" ? 95 : (brand === "Nothing" || brand === "Motorola" ? 90 : 80),
-                        durability: 70 + Math.floor(Math.random() * 22),
-                        vfm: priceBase < 35000 ? 88 + Math.floor(Math.random() * 8) : 75 + Math.floor(Math.random() * 12),
-                        popularity: 70 + Math.floor(Math.random() * 28),
-                        verified: true,
-                        status: "Confirmed",
-                        specs: {
-                            chip: chips[idx % chips.length],
-                            ram: priceBase > 40000 ? "12GB" : "8GB",
-                            storage: priceBase > 30000 ? "256GB" : "128GB",
-                            battery: `${4500 + (idx * 150) % 1500} mAh`,
-                            mainCam: `${50 + (idx % 3) * 14}MP Main OIS`,
-                            display: `6.67" AMOLED 120Hz`
-                        }
-                    });
-                });
-            });
-
-            // Expand procedurally to guarantee over 200 items for rich multi-brand evaluation
-            let suffixCounter = 1;
-            while (catalog.length < 205) {
-                const bObj = brands[suffixCounter % brands.length];
-                const simulatedPrice = 11000 + (suffixCounter * 850) % 90000;
-                catalog.push({
-                    id: idCounter++,
-                    name: `${bObj.name} Series Variant ${suffixCounter}`,
-                    brand: bObj.name,
-                    price: simulatedPrice,
-                    camera: 65 + (suffixCounter * 7) % 30,
-                    performance: 65 + (suffixCounter * 11) % 32,
-                    gaming: 60 + (suffixCounter * 9) % 35,
-                    battery: 75 + (suffixCounter * 5) % 22,
-                    display: 70 + (suffixCounter * 4) % 26,
-                    design: 68 + (suffixCounter * 6) % 28,
-                    software: 80,
-                    durability: 72 + (suffixCounter * 3) % 20,
-                    vfm: 82,
-                    popularity: 75 + (suffixCounter * 2) % 20,
-                    verified: suffixCounter % 5 !== 0, // mark some unverified/uncertain
-                    status: suffixCounter % 5 === 0 ? "Region Spec Variant" : "Confirmed",
-                    specs: {
-                        chip: "Octa-Core 5G Processor",
-                        ram: "8GB",
-                        storage: "128GB / 256GB",
-                        battery: "5000 mAh",
-                        mainCam: "50MP Dual Camera",
-                        display: "6.67\" FHD+ 120Hz"
-                    }
-                });
-                suffixCounter++;
-            }
-
-            return catalog;
+    function toggleCompare(phoneId) {
+      const index = compareList.findIndex(p => p.id === phoneId);
+      if (index > -1) {
+        compareList.splice(index, 1);
+      } else {
+        if (compareList.length >= 4) {
+          alert("You can compare up to 4 smartphones simultaneously.");
+          return;
         }
+        const phone = phoneDatabase.find(p => p.id === phoneId);
+        if (phone) compareList.push(phone);
+      }
 
-        // Global State Variables
-        const phoneCatalog = generatePhoneCatalog();
-        let compareList = [];
-        let calculatedResults = [];
+      document.getElementById('compare-count').innerText = compareList.length;
+      
+      // Re-render current visible section
+      if (document.getElementById('recommendations-view').classList.contains('active')) renderRecommendations();
+      if (document.getElementById('catalog-view').classList.contains('active')) renderCatalog();
+      if (document.getElementById('compare-view').classList.contains('active')) renderComparison();
+    }
 
-        // -------------------------------------------------------------
-        // 2. CORE RECOMMENDATION CALCULATION ALGORITHM
-        // -------------------------------------------------------------
-        
-        function calculateRecommendations() {
-            const maxBudget = parseFloat(document.getElementById('pref-budget').value);
-            const brandPref = document.getElementById('pref-brand').value;
+    function renderComparison() {
+      const container = document.getElementById('compare-content');
 
-            // Priority Weights (1-10)
-            const wCam = parseFloat(document.getElementById('weight-camera').value);
-            const wPerf = parseFloat(document.getElementById('weight-performance').value);
-            const wGaming = parseFloat(document.getElementById('weight-gaming').value);
-            const wBatt = parseFloat(document.getElementById('weight-battery').value);
-            const wDisp = parseFloat(document.getElementById('weight-display').value);
-            const wDes = parseFloat(document.getElementById('weight-design').value);
-            const wSoft = parseFloat(document.getElementById('weight-software').value);
-            const wDur = parseFloat(document.getElementById('weight-durability').value);
-            const wVfm = parseFloat(document.getElementById('weight-vfm').value);
+      if (compareList.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-scale-unbalanced-flip"></i>
+            <h3>No Phones Selected for Comparison</h3>
+            <p>Browse the catalog or recommendations engine and click "+ Compare" to add up to 4 devices.</p>
+          </div>
+        `;
+        return;
+      }
 
-            const totalWeight = wCam + wPerf + wGaming + wBatt + wDisp + wDes + wSoft + wDur + wVfm;
+      container.innerHTML = `
+        <div class="comparison-container">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Specification</th>
+                ${compareList.map(p => `
+                  <th>
+                    <div style="font-weight:700; font-size:1.1rem; color:var(--text-main);">${p.name}</div>
+                    <div style="color:var(--accent); font-size:0.95rem;">₹${p.price.toLocaleString('en-IN')}</div>
+                    <button class="btn-action" style="margin-top:0.5rem; padding:0.25rem 0.5rem; font-size:0.75rem;" onclick="toggleCompare('${p.id}')">Remove</button>
+                  </th>
+                `).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Brand</td>
+                ${compareList.map(p => `<td>${p.brand}</td>`).join('')}
+              </tr>
+              <tr>
+                <td>Processor</td>
+                ${compareList.map(p => `<td>${p.processor}</td>`).join('')}
+              </tr>
+              <tr>
+                <td>Display</td>
+                ${compareList.map(p => `<td>${p.display}</td>`).join('')}
+              </tr>
+              <tr>
+                <td>Camera Setup</td>
+                ${compareList.map(p => `<td>${p.camera}</td>`).join('')}
+              </tr>
+              <tr>
+                <td>Battery Capacity</td>
+                ${compareList.map(p => `<td>${p.battery}</td>`).join('')}
+              </tr>
+              <tr>
+                <td>Camera Score</td>
+                ${compareList.map(p => `<td>${p.scores.cam}/10</td>`).join('')}
+              </tr>
+              <tr>
+                <td>Performance Score</td>
+                ${compareList.map(p => `<td>${p.scores.perf}/10</td>`).join('')}
+              </tr>
+              <tr>
+                <td>Battery Score</td>
+                ${compareList.map(p => `<td>${p.scores.bat}/10</td>`).join('')}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
 
-            // Filter and Calculate Scores
-            calculatedResults = phoneCatalog.map(phone => {
-                
-                // 1. Calculate Spec Weighted Rating (0-100)
-                const weightedSum = 
-                    (phone.camera * wCam) +
-                    (phone.performance * wPerf) +
-                    (phone.gaming * wGaming) +
-                    (phone.battery * wBatt) +
-                    (phone.display * wDisp) +
-                    (phone.design * wDes) +
-                    (phone.software * wSoft) +
-                    (phone.durability * wDur) +
-                    (phone.vfm * wVfm);
-
-                const baseSpecScore = weightedSum / totalWeight;
-
-                // 2. Calculate Budget Penalty / Fit Factor
-                let budgetFitScore = 100;
-                let budgetMatch = "Ideal";
-
-                if (phone.price <= maxBudget) {
-                    // Under budget: reward phones that optimize budget without being excessively under-spec
-                    const budgetRatio = phone.price / maxBudget;
-                    if (budgetRatio < 0.4) {
-                        budgetFitScore = 80; // Too cheap, likely underpowered for requested budget
-                        budgetMatch = "Well Under Budget";
-                    } else {
-                        budgetFitScore = 100;
-                        budgetMatch = "Within Budget";
-                    }
-                } else {
-                    // Over budget: Apply realistic penalty curve
-                    const overPct = ((phone.price - maxBudget) / maxBudget) * 100;
-                    if (overPct <= 10) {
-                        budgetFitScore = 75; // Slightly above budget (10% stretch)
-                        budgetMatch = "Slight Stretch (+10%)";
-                    } else if (overPct <= 25) {
-                        budgetFitScore = 45;
-                        budgetMatch = "Over Budget (+25%)";
-                    } else {
-                        budgetFitScore = 10;
-                        budgetMatch = "Far Over Budget";
-                    }
-                }
-
-                // 3. Brand Fit Multiplier
-                let brandMultiplier = 1.0;
-                if (brandPref !== "All") {
-                    if (phone.brand.toLowerCase() === brandPref.toLowerCase()) {
-                        brandMultiplier = 1.08;
-                    } else {
-                        brandMultiplier = 0.92;
-                    }
-                }
-
-                // Final Suitability Score Calculation (80% Spec Match + 20% Budget Fit)
-                let finalScore = ((baseSpecScore * 0.8) + (budgetFitScore * 0.2)) * brandMultiplier;
-                finalScore = Math.min(99.4, Math.max(20, Math.round(finalScore * 10) / 10));
-
-                // Contextual Match Reason Generation
-                let matchReason = [];
-                if (wCam >= 8 && phone.camera >= 88) matchReason.push("Pro-grade Camera Setup");
-                if (wPerf >= 8 && phone.performance >= 90) matchReason.push("Top-tier Processing Power");
-                if (wGaming >= 8 && phone.gaming >= 90) matchReason.push("High FPS Gaming Optimized");
-                if (wBatt >= 8 && phone.battery >= 90) matchReason.push("Long Endurance Battery");
-                if (phone.price <= maxBudget && phone.vfm >= 88) matchReason.push("Exceptional Value for Money");
-                
-                if (matchReason.length === 0) matchReason.push("Balanced Specs for Daily Driving");
-
-                return {
-                    ...phone,
-                    suitabilityScore: finalScore,
-                    budgetFitScore: budgetFitScore,
-                    budgetMatch: budgetMatch,
-                    matchReason: matchReason.join(" • ")
-                };
-            });
-
-            // Apply Sorting
-            const sortBy = document.getElementById('rec-sort-by').value;
-            if (sortBy === 'score') {
-                calculatedResults.sort((a, b) => b.suitabilityScore - a.suitabilityScore);
-            } else if (sortBy === 'price_low') {
-                calculatedResults.sort((a, b) => a.price - b.price);
-            } else if (sortBy === 'price_high') {
-                calculatedResults.sort((a, b) => b.price - a.price);
-            } else if (sortBy === 'popularity') {
-                calculatedResults.sort((a, b) => b.popularity - a.popularity);
-            }
-
-            renderRecommendations();
-        }
-
-        // -------------------------------------------------------------
-        // 3. UI RENDER FUNCTIONS
-        // -------------------------------------------------------------
-        
-        function renderRecommendations() {
-            const listContainer = document.getElementById('recommendations-list');
-            const topHeroContainer = document.getElementById('top-match-hero');
-            const countBadge = document.getElementById('recommendation-count-badge');
-
-            // Filter out phones that are severely over budget for main view unless specifically selected
-            const maxBudget = parseFloat(document.getElementById('pref-budget').value);
-            const validMatches = calculatedResults.filter(p => p.price <= maxBudget * 1.25);
-            
-            countBadge.innerText = `${validMatches.length} Matches Found`;
-
-            if (validMatches.length === 0) {
-                topHeroContainer.classList.add('hidden');
-                listContainer.innerHTML = `
-                    <div class="glass-panel rounded-xl p-8 text-center space-y-3">
-                        <i data-lucide="alert-circle" class="w-10 h-10 text-amber-400 mx-auto"></i>
-                        <h4 class="text-lg font-bold text-white">No Phones Found Within Selected Filters</h4>
-                        <p class="text-sm text-gray-400">Try increasing your budget slider or choosing "All Brands".</p>
-                    </div>`;
-                lucide.createIcons();
-                return;
-            }
-
-            // Top Match Best Phone Header
-            const bestPhone = validMatches[0];
-            topHeroContainer.classList.remove('hidden');
-            topHeroContainer.innerHTML = `
-                <div class="absolute -right-8 -bottom-8 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-                    <div class="space-y-3">
-                        <div class="flex items-center space-x-2">
-                            <span class="bg-gradient-to-r from-amber-500 to-amber-600 text-black text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider flex items-center space-x-1 shadow-md">
-                                <i data-lucide="crown" class="w-3.5 h-3.5 mr-1"></i> #1 BEST MATCH
-                            </span>
-                            <span class="text-xs text-gray-400 font-medium">Score: ${bestPhone.suitabilityScore}%</span>
-                        </div>
-                        <div>
-                            <h2 class="text-2xl sm:text-3xl font-extrabold text-white">${bestPhone.name}</h2>
-                            <p class="text-xs sm:text-sm text-indigo-300 font-medium mt-1">${bestPhone.matchReason}</p>
-                        </div>
-                        <div class="flex flex-wrap items-center gap-3 text-xs text-gray-300">
-                            <span class="bg-dark-card border border-gray-700 px-2.5 py-1 rounded-md">⚡ ${bestPhone.specs.chip}</span>
-                            <span class="bg-dark-card border border-gray-700 px-2.5 py-1 rounded-md">📷 ${bestPhone.specs.mainCam}</span>
-                            <span class="bg-dark-card border border-gray-700 px-2.5 py-1 rounded-md">🔋 ${bestPhone.specs.battery}</span>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col items-start md:items-end justify-between space-y-3">
-                        <div class="text-left md:text-right">
-                            <span class="text-xs text-gray-400 block">Verified Market Price</span>
-                            <span class="text-2xl sm:text-3xl font-extrabold text-emerald-400">₹${bestPhone.price.toLocaleString('en-IN')}</span>
-                        </div>
-                        <div class="flex items-center space-x-2 w-full sm:w-auto">
-                            <button onclick="openModal(${bestPhone.id})" class="flex-1 sm:flex-initial px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg transition-colors">
-                                Full Specs & Breakdown
-                            </button>
-                            <button onclick="toggleCompare(${bestPhone.id})" class="px-3 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs rounded-lg transition-colors">
-                                + Compare
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            // List of other top matches
-            listContainer.innerHTML = validMatches.slice(1, 15).map((phone, index) => {
-                const rank = index + 2;
-                const isCompared = compareList.includes(phone.id);
-                return `
-                <div class="glass-panel rounded-xl p-4 sm:p-5 border border-gray-800 hover:border-gray-700 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                    <div class="flex items-start space-x-4">
-                        <div class="w-10 h-10 rounded-xl bg-gray-800 border border-gray-700 flex items-center justify-center text-sm font-bold text-indigo-400 flex-shrink-0">
-                            #${rank}
-                        </div>
-                        <div class="space-y-1">
-                            <div class="flex flex-wrap items-center gap-2">
-                                <h4 class="font-bold text-white text-base hover:text-indigo-300 cursor-pointer" onclick="openModal(${phone.id})">${phone.name}</h4>
-                                ${!phone.verified ? `<span class="bg-amber-950/80 text-amber-400 border border-amber-800 text-[10px] px-2 py-0.5 rounded font-medium">${phone.status}</span>` : ''}
-                            </div>
-                            <p class="text-xs text-gray-400">${phone.matchReason}</p>
-                            
-                            <div class="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-gray-400">
-                                <span>${phone.specs.chip}</span> •
-                                <span>${phone.specs.display}</span> •
-                                <span>Pop Score: <strong class="text-gray-200">${phone.popularity}%</strong></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between md:justify-end w-full md:w-auto gap-4 pt-3 md:pt-0 border-t md:border-t-0 border-gray-800">
-                        <div class="text-left md:text-right">
-                            <div class="flex items-center space-x-1.5 md:justify-end">
-                                <span class="text-xs text-gray-400">Suitability:</span>
-                                <span class="text-sm font-extrabold text-indigo-400">${phone.suitabilityScore}%</span>
-                            </div>
-                            <span class="text-base font-bold text-white block">₹${phone.price.toLocaleString('en-IN')}</span>
-                        </div>
-
-                        <div class="flex items-center space-x-2">
-                            <button onclick="toggleCompare(${phone.id})" class="px-3 py-2 ${isCompared ? 'bg-indigo-900/60 text-indigo-300 border border-indigo-500' : 'bg-gray-800 text-gray-300'} hover:bg-gray-700 text-xs rounded-lg transition-colors">
-                                ${isCompared ? 'Added' : '+ Compare'}
-                            </button>
-                            <button onclick="openModal(${phone.id})" class="p-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg">
-                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                `;
-            }).join('');
-
-            lucide.createIcons();
-        }
-
-        // -------------------------------------------------------------
-        // 4. CATALOG SEARCH & FILTERING
-        // -------------------------------------------------------------
-        
-        function populateBrandFilter() {
-            const select = document.getElementById('catalog-filter-brand');
-            const brands = [...new Set(phoneCatalog.map(p => p.brand))].sort();
-            brands.forEach(b => {
-                const opt = document.createElement('option');
-                opt.value = b;
-                opt.innerText = b;
-                select.appendChild(opt);
-            });
-            document.getElementById('total-count').innerText = phoneCatalog.length;
-        }
-
-        function filterCatalog() {
-            const query = document.getElementById('catalog-search').value.toLowerCase();
-            const brand = document.getElementById('catalog-filter-brand').value;
-            const budget = document.getElementById('catalog-filter-budget').value;
-            const status = document.getElementById('catalog-filter-status').value;
-
-            const filtered = phoneCatalog.filter(phone => {
-                const matchesSearch = phone.name.toLowerCase().includes(query) || phone.specs.chip.toLowerCase().includes(query);
-                const matchesBrand = brand === 'All' || phone.brand === brand;
-                const matchesStatus = status === 'All' || (status === 'Released' ? phone.verified : !phone.verified);
-                
-                let matchesBudget = true;
-                if (budget === 'under15k') matchesBudget = phone.price <= 15000;
-                else if (budget === '15k-30k') matchesBudget = phone.price > 15000 && phone.price <= 30000;
-                else if (budget === '30k-50k') matchesBudget = phone.price > 30000 && phone.price <= 50000;
-                else if (budget === '50k-80k') matchesBudget = phone.price > 50000 && phone.price <= 80000;
-                else if (budget === 'above80k') matchesBudget = phone.price > 80000;
-
-                return matchesSearch && matchesBrand && matchesStatus && matchesBudget;
-            });
-
-            renderCatalogGrid(filtered);
-        }
-
-        function renderCatalogGrid(items) {
-            const grid = document.getElementById('catalog-grid');
-            if (items.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-400">No smartphones match your filter criteria.</div>`;
-                return;
-            }
-
-            grid.innerHTML = items.map(phone => {
-                const isCompared = compareList.includes(phone.id);
-                return `
-                <div class="glass-panel rounded-xl p-5 border border-gray-800 hover:border-gray-700 transition-all flex flex-col justify-between space-y-4">
-                    <div>
-                        <div class="flex items-start justify-between">
-                            <span class="text-[11px] font-semibold tracking-wider text-indigo-400 uppercase">${phone.brand}</span>
-                            ${!phone.verified ? `<span class="bg-amber-950/80 text-amber-400 text-[10px] px-2 py-0.5 rounded">${phone.status}</span>` : ''}
-                        </div>
-                        <h4 class="font-bold text-white text-lg mt-1">${phone.name}</h4>
-                        <p class="text-xl font-extrabold text-emerald-400 mt-2">₹${phone.price.toLocaleString('en-IN')}</p>
-
-                        <div class="mt-4 space-y-1.5 text-xs text-gray-300 border-t border-gray-800/80 pt-3">
-                            <div class="flex justify-between">
-                                <span class="text-gray-500">Processor:</span>
-                                <span class="font-medium">${phone.specs.chip}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-500">Camera:</span>
-                                <span class="font-medium">${phone.specs.mainCam}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-500">Battery:</span>
-                                <span class="font-medium">${phone.specs.battery}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center space-x-2 pt-2">
-                        <button onclick="openModal(${phone.id})" class="flex-1 py-2 bg-gray-800 hover:bg-gray-700 text-white text-xs font-medium rounded-lg transition-colors">
-                            View Details
-                        </button>
-                        <button onclick="toggleCompare(${phone.id})" class="px-3 py-2 ${isCompared ? 'bg-indigo-900/60 text-indigo-300 border border-indigo-500' : 'bg-gray-800 text-gray-300'} hover:bg-gray-700 text-xs rounded-lg transition-colors">
-                            ${isCompared ? 'Added' : '+ Compare'}
-                        </button>
-                    </div>
-                </div>
-                `;
-            }).join('');
-            lucide.createIcons();
-        }
-
-        // -------------------------------------------------------------
-        // 5. COMPARISON ENGINE
-        // -------------------------------------------------------------
-        
-        function toggleCompare(id) {
-            if (compareList.includes(id)) {
-                compareList = compareList.filter(item => item !== id);
-            } else {
-                if (compareList.length >= 4) {
-                    alert("You can compare up to 4 phones at once.");
-                    return;
-                }
-                compareList.push(id);
-            }
-            updateCompareBadges();
-            if (!document.getElementById('tab-compare').classList.contains('hidden')) {
-                renderCompareView();
-            } else {
-                // Re-render current list to update button state
-                calculateRecommendations();
-                filterCatalog();
-            }
-        }
-
-        function clearComparison() {
-            compareList = [];
-            updateCompareBadges();
-            renderCompareView();
-        }
-
-        function updateCompareBadges() {
-            const badge = document.getElementById('compare-badge');
-            const mobileBadge = document.getElementById('mobile-compare-badge');
-            if (compareList.length > 0) {
-                badge.innerText = compareList.length;
-                mobileBadge.innerText = compareList.length;
-                badge.classList.remove('hidden');
-                mobileBadge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-                mobileBadge.classList.add('hidden');
-            }
-        }
-
-        function renderCompareView() {
-            const container = document.getElementById('compare-container');
-            if (compareList.length === 0) {
-                container.innerHTML = `
-                    <div class="glass-panel rounded-2xl p-12 text-center space-y-4">
-                        <i data-lucide="columns" class="w-12 h-12 text-gray-500 mx-auto"></i>
-                        <h3 class="text-xl font-bold text-white">No Phones Selected for Comparison</h3>
-                        <p class="text-sm text-gray-400">Click '+ Compare' on any smartphone from recommendations or catalog to evaluate side-by-side.</p>
-                        <button onclick="switchTab('recommendations')" class="px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg">Browse Recommendations</button>
-                    </div>`;
-                lucide.createIcons();
-                return;
-            }
-
-            const phones = compareList.map(id => phoneCatalog.find(p => p.id === id));
-
-            container.innerHTML = `
-                <table class="w-full text-left border-collapse min-w-[600px]">
-                    <thead>
-                        <tr class="border-b border-gray-800">
-                            <th class="p-4 bg-dark-card text-gray-400 font-semibold text-xs w-48">Spec / Metric</th>
-                            ${phones.map(p => `
-                                <th class="p-4 bg-dark-card text-white font-bold text-sm min-w-[200px]">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <span class="text-[10px] text-indigo-400 uppercase tracking-wider block">${p.brand}</span>
-                                            <span>${p.name}</span>
-                                        </div>
-                                        <button onclick="toggleCompare(${p.id})" class="text-gray-500 hover:text-red-400 p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
-                                    </div>
-                                    <span class="text-emerald-400 font-extrabold text-base block mt-2">₹${p.price.toLocaleString('en-IN')}</span>
-                                </th>
-                            `).join('')}
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-800 text-xs text-gray-300">
-                        <tr>
-                            <td class="p-4 font-semibold text-gray-400 bg-dark-card/50">Status</td>
-                            ${phones.map(p => `<td class="p-4">${p.verified ? 'Confirmed Launch' : `<span class="text-amber-400">${p.status}</span>`}</td>`).join('')}
-                        </tr>
-                        <tr>
-                            <td class="p-4 font-semibold text-gray-400 bg-dark-card/50">Processor</td>
-                            ${phones.map(p => `<td class="p-4 font-medium">${p.specs.chip}</td>`).join('')}
-                        </tr>
-                        <tr>
-                            <td class="p-4 font-semibold text-gray-400 bg-dark-card/50">RAM / Storage</td>
-                            ${phones.map(p => `<td class="p-4">${p.specs.ram} / ${p.specs.storage}</td>`).join('')}
-                        </tr>
-                        <tr>
-                            <td class="p-4 font-semibold text-gray-400 bg-dark-card/50">Camera Rating</td>
-                            ${phones.map(p => `<td class="p-4"><div class="flex items-center space-x-2"><span>${p.camera}/100</span> ${renderBar(p.camera)}</div></td>`).join('')}
-                        </tr>
-                        <tr>
-                            <td class="p-4 font-semibold text-gray-400 bg-dark-card/50">Performance Rating</td>
-                            ${phones.map(p => `<td class="p-4"><div class="flex items-center space-x-2"><span>${p.performance}/100</span> ${renderBar(p.performance)}</div></td>`).join('')}
-                        </tr>
-                        <tr>
-                            <td class="p-4 font-semibold text-gray-400 bg-dark-card/50">Gaming Score</td>
-                            ${phones.map(p => `<td class="p-4"><div class="flex items-center space-x-2"><span>${p.gaming}/100</span> ${renderBar(p.gaming)}</div></td>`).join('')}
-                        </tr>
-                        <tr>
-                            <td class="p-4 font-semibold text-gray-400 bg-dark-card/50">Battery Endurance</td>
-                            ${phones.map(p => `<td class="p-4">${p.specs.battery} (${p.battery}/100)</td>`).join('')}
-                        </tr>
-                        <tr>
-                            <td class="p-4 font-semibold text-gray-400 bg-dark-card/50">Display Spec</td>
-                            ${phones.map(p => `<td class="p-4">${p.specs.display}</td>`).join('')}
-                        </tr>
-                        <tr>
-                            <td class="p-4 font-semibold text-gray-400 bg-dark-card/50">Software Score</td>
-                            ${phones.map(p => `<td class="p-4">${p.software}/100</td>`).join('')}
-                        </tr>
-                    </tbody>
-                </table>
-            `;
-            lucide.createIcons();
-        }
-
-        function renderBar(score) {
-            return `
-                <div class="w-16 h-1.5 bg-gray-800 rounded-full overflow-hidden inline-block">
-                    <div class="h-full bg-indigo-500" style="width: ${score}%"></div>
-                </div>
-            `;
-        }
-
-        // -------------------------------------------------------------
-        // 6. MODAL DETAIL VIEW
-        // -------------------------------------------------------------
-        
-        function openModal(id) {
-            const phone = phoneCatalog.find(p => p.id === id);
-            if (!phone) return;
-
-            const modal = document.getElementById('phone-modal');
-            const content = document.getElementById('modal-content');
-
-            content.innerHTML = `
-                <div class="space-y-6">
-                    <div>
-                        <div class="flex items-center space-x-2">
-                            <span class="text-xs uppercase tracking-wider text-indigo-400 font-bold">${phone.brand}</span>
-                            ${!phone.verified ? `<span class="bg-amber-950 text-amber-400 text-[10px] px-2 py-0.5 rounded border border-amber-800">${phone.status}</span>` : ''}
-                        </div>
-                        <h2 class="text-2xl font-bold text-white mt-1">${phone.name}</h2>
-                        <span class="text-2xl font-extrabold text-emerald-400 block mt-1">₹${phone.price.toLocaleString('en-IN')}</span>
-                    </div>
-
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-                        <div class="bg-dark-card p-3 rounded-lg border border-gray-800">
-                            <span class="text-gray-500 block">Processor</span>
-                            <span class="font-bold text-white mt-0.5 block">${phone.specs.chip}</span>
-                        </div>
-                        <div class="bg-dark-card p-3 rounded-lg border border-gray-800">
-                            <span class="text-gray-500 block">RAM & Storage</span>
-                            <span class="font-bold text-white mt-0.5 block">${phone.specs.ram} | ${phone.specs.storage}</span>
-                        </div>
-                        <div class="bg-dark-card p-3 rounded-lg border border-gray-800">
-                            <span class="text-gray-500 block">Battery & Charging</span>
-                            <span class="font-bold text-white mt-0.5 block">${phone.specs.battery}</span>
-                        </div>
-                        <div class="bg-dark-card p-3 rounded-lg border border-gray-800">
-                            <span class="text-gray-500 block">Main Camera</span>
-                            <span class="font-bold text-white mt-0.5 block">${phone.specs.mainCam}</span>
-                        </div>
-                        <div class="bg-dark-card p-3 rounded-lg border border-gray-800">
-                            <span class="text-gray-500 block">Display</span>
-                            <span class="font-bold text-white mt-0.5 block">${phone.specs.display}</span>
-                        </div>
-                        <div class="bg-dark-card p-3 rounded-lg border border-gray-800">
-                            <span class="text-gray-500 block">Popularity Score</span>
-                            <span class="font-bold text-indigo-400 mt-0.5 block">${phone.popularity}%</span>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3 border-t border-gray-800 pt-4">
-                        <h4 class="font-bold text-white text-sm">Individual Metric Category Scores</h4>
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-xs">
-                            ${renderMetricRow('Camera Quality', phone.camera)}
-                            ${renderMetricRow('Processing Power', phone.performance)}
-                            ${renderMetricRow('Gaming High FPS', phone.gaming)}
-                            ${renderMetricRow('Battery Endurance', phone.battery)}
-                            ${renderMetricRow('Display Tech', phone.display)}
-                            ${renderMetricRow('Design & Build', phone.design)}
-                            ${renderMetricRow('Software & Updates', phone.software)}
-                            ${renderMetricRow('Durability / IP Rating', phone.durability)}
-                            ${renderMetricRow('Value for Money', phone.vfm)}
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end space-x-3 border-t border-gray-800 pt-4">
-                        <button onclick="toggleCompare(${phone.id}); closeModal();" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-xs font-semibold rounded-lg">
-                            ${compareList.includes(phone.id) ? 'Remove from Compare' : '+ Add to Comparison'}
-                        </button>
-                        <button onclick="closeModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg">
-                            Done
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            modal.classList.remove('hidden');
-            lucide.createIcons();
-        }
-
-        function renderMetricRow(label, score) {
-            return `
-                <div class="flex items-center justify-between">
-                    <span class="text-gray-400">${label}:</span>
-                    <div class="flex items-center space-x-2">
-                        <span class="font-semibold text-gray-200">${score}/100</span>
-                        <div class="w-20 h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                            <div class="h-full bg-indigo-500" style="width: ${score}%"></div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function closeModal() {
-            document.getElementById('phone-modal').classList.add('hidden');
-        }
-
-        // -------------------------------------------------------------
-        // 7. UTILITY & NAVIGATION FUNCTIONS
-        // -------------------------------------------------------------
-        
-        function updateBudgetLabel(val) {
-            document.getElementById('budget-value').innerText = `₹${parseInt(val).toLocaleString('en-IN')}`;
-        }
-
-        function resetPreferences() {
-            document.getElementById('preferences-form').reset();
-            updateBudgetLabel(45000);
-            document.getElementById('weight-camera-val').innerText = 8;
-            document.getElementById('weight-performance-val').innerText = 8;
-            document.getElementById('weight-gaming-val').innerText = 7;
-            document.getElementById('weight-battery-val').innerText = 8;
-            document.getElementById('weight-display-val').innerText = 7;
-            document.getElementById('weight-design-val').innerText = 6;
-            document.getElementById('weight-software-val').innerText = 8;
-            document.getElementById('weight-durability-val').innerText = 6;
-            document.getElementById('weight-vfm-val').innerText = 9;
-            calculateRecommendations();
-        }
-
-        function switchTab(tab) {
-            document.getElementById('tab-recommendations').classList.add('hidden');
-            document.getElementById('tab-catalog').classList.add('hidden');
-            document.getElementById('tab-compare').classList.add('hidden');
-
-            document.getElementById('nav-recs').className = "px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 transition-colors flex items-center space-x-2";
-            document.getElementById('nav-catalog').className = "px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 transition-colors flex items-center space-x-2";
-            document.getElementById('nav-compare').className = "px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 transition-colors flex items-center space-x-2 relative";
-
-            if (tab === 'recommendations') {
-                document.getElementById('tab-recommendations').classList.remove('hidden');
-                document.getElementById('nav-recs').className = "px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white transition-colors flex items-center space-x-2";
-            } else if (tab === 'catalog') {
-                document.getElementById('tab-catalog').classList.remove('hidden');
-                document.getElementById('nav-catalog').className = "px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white transition-colors flex items-center space-x-2";
-                filterCatalog();
-            } else if (tab === 'compare') {
-                document.getElementById('tab-compare').classList.remove('hidden');
-                document.getElementById('nav-compare').className = "px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white transition-colors flex items-center space-x-2 relative";
-                renderCompareView();
-            }
-        }
-
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        }
-
-        // Initialize App on DOM Load
-        window.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            populateBrandFilter();
-            calculateRecommendations();
-        });
-    </script>
+    // Initial Execution
+    updateFilters();
+  </script>
 </body>
-</html>,'display'],Photography:['Photography','camera','display','design'],Content:['Content creation','camera','performance','display'],Student:['Student','battery','value','software'],Premium:['Premium experience','design','build','software']};
-// Price snapshots and official source links verified 29 August 2026. Scores are PhonePilot's editorial matching rubric, not manufacturer benchmarks.
-const phones=[
- {name:'Samsung Galaxy A26 5G',brand:'Samsung · 8GB / 128GB',price:24999,tags:['budget','IP67','6 OS upgrades'],pop:78,imageUrl:'',source:'https://www.samsung.com/in/smartphones/galaxy-a/galaxy-a26-5g-mint-128gb-sm-a266blgkins/buy/',scores:{performance:62,gaming:56,camera:68,battery:78,display:75,design:72,software:88,build:81,value:89}},
- {name:'Nothing Phone (3a) Pro',brand:'Nothing · 8GB / 128GB',price:29999,tags:['telephoto','Glyph design','AMOLED'],pop:80,imageUrl:'',source:'https://in.nothing.tech/products/phone-3a-pro',scores:{performance:71,gaming:67,camera:84,battery:81,display:89,design:93,software:80,build:76,value:87}},
- {name:'OnePlus 13R',brand:'OnePlus · 12GB / 256GB',price:42999,tags:['Snapdragon 8 Gen 3','6000mAh','120Hz LTPO'],pop:87,imageUrl:'',source:'https://www.oneplus.in/13r/specs',scores:{performance:90,gaming:91,camera:78,battery:93,display:91,design:82,software:82,build:82,value:88}},
- {name:'Samsung Galaxy A56 5G',brand:'Samsung · 8GB / 128GB',price:42999,tags:['AMOLED','IP67','6 OS upgrades'],pop:83,imageUrl:'',source:'https://www.samsung.com/in/smartphones/galaxy-a56/buy/',scores:{performance:74,gaming:70,camera:82,battery:79,display:88,design:85,software:90,build:88,value:79}},
- {name:'Google Pixel 9a',brand:'Google · 256GB',price:49999,tags:['camera','7 years updates','IP68'],pop:88,imageUrl:'',source:'https://store.google.com/in/product/pixel_9a?hl=en-IN',scores:{performance:77,gaming:66,camera:94,battery:84,display:84,design:79,software:97,build:86,value:79}},
- {name:'iQOO 13',brand:'iQOO · 12GB / 256GB',price:61999,tags:['Snapdragon 8 Elite','144Hz','6000mAh'],pop:85,imageUrl:'',source:'https://shop.iqoo.com/in/product/2052?cid=isPreload',scores:{performance:98,gaming:99,camera:86,battery:94,display:97,design:81,software:73,build:88,value:82}},
- {name:'Apple iPhone 16',brand:'Apple · 128GB',price:69900,tags:['A18','IP68','iOS'],pop:93,imageUrl:'',source:'https://www.apple.com/in/shop/buy-iphone',scores:{performance:91,gaming:84,camera:88,battery:78,display:82,design:90,software:93,build:91,value:68}},
- {name:'Samsung Galaxy S25 Ultra',brand:'Samsung · 12GB / 256GB',price:129999,tags:['flagship','S Pen','camera'],pop:91,imageUrl:'',source:'https://www.samsung.com/in/smartphones/galaxy-s25-ultra/buy/',scores:{performance:97,gaming:93,camera:96,battery:88,display:96,design:91,software:94,build:96,value:66}},
- {name:'Apple iPhone 17 Pro',brand:'Apple · 256GB',price:134900,tags:['A19 Pro','Pro camera','premium'],pop:90,imageUrl:'',source:'https://www.apple.com/in/shop/buy-iphone/iphone-17-pro',scores:{performance:98,gaming:92,camera:97,battery:91,display:96,design:94,software:95,build:96,value:63}}
-];
-let state={use:'Everyday',weights:Object.fromEntries(categories.map(x=>[x,6])),must:[],mustWeight:1.15,brandWeight:3,showAll:false};
-const $=s=>document.querySelector(s);const money=n=>'₹'+Number(n).toLocaleString('en-IN');
-function setup(){
- $('#uses').innerHTML=Object.entries(uses).map(([key,[label]])=>`<button class="use ${key===state.use?'active':''}" data-use="${key}">${label}</button>`).join('');
- $('#sliders').innerHTML=categories.map(c=>`<div class="slider"><div class="slider-head"><b>${labels[c]}</b><span id="v-${c}">${state.weights[c]}</span></div><input type="range" min="1" max="10" value="${state.weights[c]}" data-cat="${c}"></div>`).join('');
- $('#musts').innerHTML=categories.map(c=>`<button class="must ${state.must.includes(c)?'chosen':''}" data-must="${c}">${labels[c]}</button>`).join(''); document.querySelectorAll('[data-w]').forEach(b=>b.classList.toggle('active',+b.dataset.w===state.mustWeight)); bind(); recommend();
-}
-function bind(){
- document.querySelectorAll('.use').forEach(b=>b.onclick=()=>{state.use=b.dataset.use;setup()});
- document.querySelectorAll('[data-cat]').forEach(i=>i.oninput=()=>{state.weights[i.dataset.cat]=+i.value;$('#v-'+i.dataset.cat).textContent=i.value;recommend()});
- document.querySelectorAll('[data-must]').forEach(b=>b.onclick=()=>{let x=b.dataset.must;if(state.must.includes(x))state.must=state.must.filter(i=>i!==x);else if(state.must.length<3)state.must.push(x);$('#mustCount').textContent=state.must.length+' / 3';setup()});
- document.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{state.mustWeight=+b.dataset.w;document.querySelectorAll('[data-w]').forEach(x=>x.classList.toggle('active',x===b));recommend()});
- $('#brandWeight').value=state.brandWeight;$('#brandWeightValue').textContent=state.brandWeight+' / 10';$('#brandWeight').oninput=e=>{state.brandWeight=+e.target.value;$('#brandWeightValue').textContent=state.brandWeight+' / 10';recommend()};
- $('#viewAll').onclick=()=>{state.showAll=!state.showAll;recommend()};
- $('#find').onclick=recommend; ['min','max','over'].forEach(id=>$('#'+id).oninput=recommend);
- $('#theme').onclick=()=>{document.body.classList.toggle('light');localStorage.setItem('phonepilot-theme',document.body.classList.contains('light')?'light':'dark');$('#theme').textContent=document.body.classList.contains('light')?'☾':'☼'};
-}
-function brandScore(p){if(p.name.startsWith('Apple'))return 94;if(p.name.startsWith('Samsung'))return 91;if(p.name.startsWith('OnePlus'))return 83;if(p.name.startsWith('Google'))return 79;if(p.name.startsWith('iQOO'))return 77;if(p.name.startsWith('Nothing'))return 75;return 70;}
-function evaluate(p){let min=+$('#min').value||5000,max=+$('#max').value||200000;if(min>max)[min,max]=[max,min];let ceiling=max*($('#over').checked?1.1:1);if(p.price<min||p.price>ceiling)return null;let total=0,den=0;categories.forEach(c=>{let w=state.weights[c];if(state.must.includes(c))w*=state.mustWeight;total+=p.scores[c]*w;den+=w});let boosts=uses[state.use].slice(1);let boost=boosts.reduce((s,c)=>s+(p.scores[c]-50)*.055,0);let secondary=(p.pop-50)*.025+(p.scores.value-50)*.03+((brandScore(p)-50)*state.brandWeight*.05);let floorPenalty=state.must.reduce((s,c)=>s+(p.scores[c]<70?(70-p.scores[c])*.5:0),0);let score=Math.max(0,Math.min(100,Math.round(total/den+boost+secondary-floorPenalty)));return{...p,fit:score,ceiling,boosts,brandConfidence:brandScore(p)};}
-function reason(p){let strengths=[...categories].sort((a,b)=>p.scores[b]-p.scores[a]).slice(0,2);let tailored=[...state.must,...uses[state.use].slice(1)].find(c=>p.scores[c]>=78)||strengths[0];let weak=[...categories].filter(c=>state.weights[c]>=8&&p.scores[c]<75).sort((a,b)=>p.scores[a]-p.scores[b])[0];return{why:[`Strong ${labels[tailored].toLowerCase()} score for your profile`,`${labels[strengths[0]]} is a standout at this budget`],not:weak?`Less ideal if ${labels[weak].toLowerCase()} is your absolute top priority.`:`No major conflict with your highest priorities.`};}
-function img(p){return p.imageUrl?`<img src="${p.imageUrl}" alt="${p.name}" onerror="this.remove();this.parentElement.innerHTML='<span class=\\'fallback\\'></span>'">`:'<span class="fallback" aria-label="Phone image placeholder"></span>'}
-function recommend(){
-  let ranked=phones.map(evaluate).filter(Boolean).sort((a,b)=>b.fit-a.fit);
-  let matches=state.showAll?ranked:ranked.slice(0,3);
-  let max=+$('#max').value||0;
-  $('#budgetText').textContent=`${money(+$('#min').value||5000)} — ${money(max)}`;
-  $('#mustCount').textContent=state.must.length+' / 3';
-  $('#resultsTitle').textContent=state.showAll?'All ranked phones':'Your top matches';
-  $('#viewAll').textContent=state.showAll?'Show top 3':'View all '+ranked.length+' ranked phones';
-  $('#resultHint').textContent=ranked.length?`${state.showAll?ranked.length+' ranked matches':matches.length+' best matches'} within your budget • ${uses[state.use][0]} focus`:'Try widening your range or enabling 10% flexibility';
-  $('#cards').innerHTML=matches.length?matches.map((p,i)=>{
-    let r=reason(p),top=[...categories].sort((a,b)=>p.scores[b]-p.scores[a]).slice(0,4);
-    let rank=String(i+1).padStart(2,'0');
-    return `<article class="card"><div class="device-img">${img(p)}</div><div><div class="rank">#${rank} PERSONAL MATCH</div><h3 class="name">${p.name}</h3><div class="sub">${p.brand} · <a class="source-link" href="${p.source}" target="_blank" rel="noopener">official source ↗</a></div><div class="reasons">${r.why.map(x=>`<span class="reason">${x}</span>`).join('')}</div><div class="why-not"><b>Why NOT?</b> ${r.not}</div><div class="chips">${p.tags.map(t=>`<span class="tag">${t}</span>`).join('')}<span class="tag">brand confidence ${p.brandConfidence}/100</span></div></div><div class="score-side"><div class="score">${p.fit}%<small>suitability</small></div><div class="price">${money(p.price)}<small style="color:var(--muted);font-weight:400">price checked 29 Aug 2026</small></div><div class="scorebars" title="Top category scores">${top.map(c=>`<span class="bar" style="height:${p.scores[c]/3}px" title="${labels[c]} ${p.scores[c]}"></span>`).join('')}</div><small style="display:block;color:var(--muted);font-size:9px;line-height:1.5;margin-top:6px">${top.map(c=>`${labels[c]} ${p.scores[c]}`).join(' · ')}</small></div></article>`
-  }).join(''):'<div class="empty"><strong>No close matches yet</strong>Increase your maximum budget or switch on the 10% flexibility option.</div>';
-}
-if(localStorage.getItem('phonepilot-theme')==='light'){document.body.classList.add('light');setTimeout(()=>$('#theme').textContent='☾')};setup();
-</script>
-</body></html>
+</html>
