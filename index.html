@@ -389,7 +389,7 @@
 
     <script>
         const phoneDatabase = [
-            // OPPO Models (14 Mandatory)
+            // OPPO Models (All 14 Mandatory Models)
             { id: "oppo-find-x9-ultra", name: "OPPO Find X9 Ultra", brand: "OPPO", price: 1200, releaseDate: "April 2026", camera: 10, gaming: 10, battery: 9, display: 10, chip: "Snapdragon 8 Elite Gen 5", batteryCap: "5500 mAh" },
             { id: "oppo-find-x7-pro-ultra", name: "OPPO Find X7 Pro Ultra", brand: "OPPO", price: 1100, releaseDate: "January 2024", camera: 10, gaming: 9, battery: 8, display: 10, chip: "Snapdragon 8 Gen 3", batteryCap: "5000 mAh" },
             { id: "oppo-find-n3-flip", name: "OPPO Find N3 Flip", brand: "OPPO", price: 999, releaseDate: "October 2023", camera: 8, gaming: 8, battery: 7, display: 9, chip: "Dimensity 9200", batteryCap: "4300 mAh" },
@@ -519,7 +519,7 @@
             const searchTerm = searchInput.value.toLowerCase().trim();
             const sortMode = sortSelect.value;
 
-            // Toggle clear button
+            // Toggle clear button visibility
             clearSearchBtn.style.display = searchTerm ? 'block' : 'none';
 
             // 1. Unified Search & Filtering
@@ -535,7 +535,7 @@
                 return matchesBudget && matchesBrand && matchesSearch;
             });
 
-            // Update Counter Status
+            // Update Dynamic Phone Counter Status
             catalogStatus.innerText = `Showing ${filtered.length} of ${phoneDatabase.length} phones`;
 
             // 2. Map Match Scores
@@ -664,7 +664,7 @@
             element.addEventListener('input', renderCatalog);
         });
 
-        // App Init
+        // Application Initialization
         initBrandFilter();
         renderCatalog();
     </script>
