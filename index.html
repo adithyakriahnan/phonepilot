@@ -104,7 +104,6 @@
         }
 
         select, input[type="text"] {
-            width: 100%;
             padding: 10px;
             border-radius: 6px;
             border: 1px solid var(--border);
@@ -115,14 +114,36 @@
 
         .catalog-controls {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
 
-        .catalog-controls input {
+        .search-container {
+            display: flex;
+            gap: 8px;
             flex: 2;
-            min-width: 200px;
+            min-width: 280px;
+        }
+
+        .search-container input {
+            flex: 1;
+        }
+
+        .search-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+
+        .search-btn:hover {
+            background-color: var(--accent-hover);
         }
 
         .catalog-controls select {
@@ -229,7 +250,6 @@
             background-color: #10b981;
         }
 
-        /* Comparison Drawer/Section */
         .compare-section {
             margin-top: 40px;
             background-color: var(--card-bg);
@@ -282,6 +302,7 @@
     </header>
 
     <div class="main-layout">
+        <!-- Sidebar Controls -->
         <aside class="panel">
             <h2>Recommendation Engine</h2>
             
@@ -328,9 +349,13 @@
             </div>
         </aside>
 
+        <!-- Catalog Section -->
         <main>
             <div class="catalog-controls">
-                <input type="text" id="search-input" placeholder="Search phone name, specs...">
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Search phone name, specs...">
+                    <button class="search-btn" id="search-btn" onclick="renderCatalog()">🔍 Search</button>
+                </div>
                 <select id="sort-select">
                     <option value="recommended">Recommended</option>
                     <option value="newest">Newest First</option>
@@ -342,10 +367,12 @@
             </div>
 
             <div class="phone-grid" id="phone-grid">
-                </div>
+                <!-- Dynamically Populated -->
+            </div>
         </main>
     </div>
 
+    <!-- Compare Section -->
     <section class="compare-section" id="compare-section">
         <div class="compare-header">
             <h2>Phone Comparison (<span id="compare-count">0</span>/4)</h2>
@@ -359,7 +386,7 @@
     <script>
         const phoneDatabase = [
             // OPPO Models Mandatory Collection
-            { name: "OPPO Find X9 Ultra", brand: "OPPO", price: 1200, releaseDate: "Upcoming", camera: 10, gaming: 10, battery: 9, display: 10, chip: "Snapdragon 8 Gen 4", batteryCap: "5500 mAh" },
+            { name: "OPPO Find X9 Ultra", brand: "OPPO", price: 1200, releaseDate: "April 2026", camera: 10, gaming: 10, battery: 9, display: 10, chip: "Snapdragon 8 Elite Gen 5", batteryCap: "5500 mAh" },
             { name: "OPPO Find X7 Pro Ultra", brand: "OPPO", price: 1100, releaseDate: "January 2024", camera: 10, gaming: 9, battery: 8, display: 10, chip: "Snapdragon 8 Gen 3", batteryCap: "5000 mAh" },
             { name: "OPPO Find N3 Flip", brand: "OPPO", price: 999, releaseDate: "October 2023", camera: 8, gaming: 8, battery: 7, display: 9, chip: "Dimensity 9200", batteryCap: "4300 mAh" },
             { name: "OPPO Reno16 Pro 5G", brand: "OPPO", price: 650, releaseDate: "Upcoming", camera: 9, gaming: 8, battery: 9, display: 9, chip: "Dimensity 8400", batteryCap: "5500 mAh" },
@@ -549,6 +576,11 @@
         budgetInput.addEventListener('input', (e) => {
             budgetVal.innerText = `$${e.target.value}`;
             renderCatalog();
+        });
+
+        // Trigger on Enter key inside search box
+        searchInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') renderCatalog();
         });
 
         [brandFilter, pCamera, pGaming, pBattery, pDisplay, searchInput, sortSelect].forEach(element => {
