@@ -1,958 +1,562 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PhonePilot AI - Smart Mobile Recommendation & Comparison Engine</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --bg-main: #0f172a;
-      --bg-card: #1e293b;
-      --bg-card-hover: #334155;
-      --primary: #3b82f6;
-      --primary-accent: #60a5fa;
-      --accent: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --border-color: #334155;
-      --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhonePilot - Smart Phone Recommendations & Comparison</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --badge-bg: #312e81;
+            --badge-text: #a5b4fc;
+        }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
 
-    body {
-      background-color: var(--bg-main);
-      color: var(--text-main);
-      font-family: var(--font-family);
-      line-height: 1.5;
-      padding-bottom: 60px;
-    }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
-    header {
-      background-color: rgba(30, 41, 59, 0.8);
-      backdrop-filter: blur(10px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      border-bottom: 1px solid var(--border-color);
-      padding: 1rem 2rem;
-    }
+        header {
+            text-align: center;
+            padding: 20px 0 30px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
 
-    .nav-container {
-      max-width: 1400px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+        header h1 {
+            font-size: 2.5rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--primary-accent);
-    }
+        header p {
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
 
-    .logo i {
-      font-size: 1.75rem;
-    }
+        .main-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 30px;
+        }
 
-    nav {
-      display: flex;
-      gap: 1rem;
-    }
+        @media (max-width: 900px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
 
-    .nav-btn {
-      background: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      padding: 0.5rem 1.25rem;
-      border-radius: 0.5rem;
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+        .panel {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            height: fit-content;
+        }
 
-    .nav-btn:hover, .nav-btn.active {
-      background: var(--primary);
-      border-color: var(--primary);
-    }
+        .panel h2 {
+            font-size: 1.25rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
 
-    .badge {
-      background: var(--accent);
-      color: #000;
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 0.1rem 0.5rem;
-      border-radius: 1rem;
-    }
+        .form-group {
+            margin-bottom: 18px;
+        }
 
-    main {
-      max-width: 1400px;
-      margin: 2rem auto;
-      padding: 0 1.5rem;
-    }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
 
-    .section-title {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+        .form-group input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent);
+        }
 
-    /* Controls & Sliders Layout */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 360px 1fr;
-      gap: 2rem;
-    }
+        .range-val {
+            text-align: right;
+            font-weight: bold;
+            color: var(--badge-text);
+            font-size: 0.9rem;
+        }
 
-    @media (max-width: 1024px) {
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-      }
-    }
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
 
-    .filter-panel {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      height: fit-content;
-    }
+        .catalog-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
 
-    .filter-group {
-      margin-bottom: 1.5rem;
-    }
+        .catalog-controls input {
+            flex: 2;
+            min-width: 200px;
+        }
 
-    .filter-group label {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
+        .catalog-controls select {
+            flex: 1;
+            min-width: 160px;
+        }
 
-    .filter-group input[type="range"] {
-      width: 100%;
-      accent-color: var(--primary-accent);
-    }
+        .phone-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
 
-    .filter-group select, .search-input, .sort-select {
-      width: 100%;
-      padding: 0.75rem;
-      background: var(--bg-main);
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      border-radius: 0.5rem;
-      outline: none;
-    }
+        .phone-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            transition: transform 0.2s, border-color 0.2s;
+        }
 
-    .reset-btn {
-      width: 100%;
-      padding: 0.75rem;
-      background: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-muted);
-      border-radius: 0.5rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+        .phone-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+        }
 
-    .reset-btn:hover {
-      background: var(--bg-card-hover);
-      color: var(--text-main);
-    }
+        .match-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--badge-bg);
+            color: var(--badge-text);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            border: 1px solid var(--accent);
+        }
 
-    /* Phone Cards Grid */
-    .phones-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.5rem;
-    }
+        .phone-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            padding-right: 60px;
+        }
 
-    .phone-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 1rem;
-      padding: 1.25rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-      transition: transform 0.2s, border-color 0.2s;
-    }
+        .brand-tag {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
 
-    .phone-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--primary-accent);
-    }
+        .release-date-tag {
+            font-size: 0.85rem;
+            color: var(--badge-text);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
 
-    .suitability-badge {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: var(--accent);
-      color: #052e16;
-      font-weight: 800;
-      padding: 0.25rem 0.6rem;
-      border-radius: 2rem;
-      font-size: 0.85rem;
-    }
+        .specs-list {
+            list-style: none;
+            margin: 15px 0;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
 
-    .phone-brand {
-      color: var(--primary-accent);
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-    }
+        .specs-list li {
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
 
-    .phone-name {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin: 0.25rem 0 0.25rem 0;
-      padding-right: 3rem;
-    }
+        .price-tag {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #10b981;
+            margin: 10px 0;
+        }
 
-    .release-badge {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-    }
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: background 0.2s;
+        }
 
-    .release-badge.upcoming {
-      color: var(--warning);
-    }
+        .btn:hover {
+            background-color: var(--accent-hover);
+        }
 
-    .phone-price {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--accent);
-      margin-bottom: 1rem;
-    }
+        .btn.selected {
+            background-color: #10b981;
+        }
 
-    .specs-list {
-      list-style: none;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-    }
+        /* Comparison Drawer/Section */
+        .compare-section {
+            margin-top: 40px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
 
-    .specs-list li {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+        .compare-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
-    .specs-list i {
-      width: 16px;
-      color: var(--primary-accent);
-    }
+        .compare-table-wrapper {
+            overflow-x: auto;
+        }
 
-    .card-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
+        table.compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            min-width: 600px;
+        }
 
-    .btn-action {
-      flex: 1;
-      padding: 0.6rem;
-      border: 1px solid var(--border-color);
-      background: var(--bg-main);
-      color: var(--text-main);
-      border-radius: 0.5rem;
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 600;
-      transition: all 0.2s;
-      text-align: center;
-    }
+        table.compare-table th, table.compare-table td {
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+        }
 
-    .btn-action:hover {
-      background: var(--primary);
-      border-color: var(--primary);
-    }
+        table.compare-table th {
+            background-color: var(--bg-color);
+            color: var(--badge-text);
+        }
 
-    .btn-action.active {
-      background: var(--accent);
-      color: #000;
-      border-color: var(--accent);
-    }
-
-    /* Comparison Table Styling */
-    .comparison-container {
-      overflow-x: auto;
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 1rem;
-      padding: 1.5rem;
-    }
-
-    .comparison-table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-    }
-
-    .comparison-table th, .comparison-table td {
-      padding: 1rem;
-      border-bottom: 1px solid var(--border-color);
-      min-width: 200px;
-    }
-
-    .comparison-table th {
-      color: var(--primary-accent);
-      font-size: 1rem;
-    }
-
-    .comparison-table td:first-child, .comparison-table th:first-child {
-      position: sticky;
-      left: 0;
-      background: var(--bg-card);
-      z-index: 10;
-      font-weight: 700;
-      min-width: 150px;
-      border-right: 1px solid var(--border-color);
-    }
-
-    /* Views visibility */
-    .view-container {
-      display: none;
-    }
-    .view-container.active {
-      display: block;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 4rem 2rem;
-      color: var(--text-muted);
-    }
-
-    .empty-state i {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
-  </style>
+        .no-results {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+    </style>
 </head>
 <body>
 
-  <header>
-    <div class="nav-container">
-      <div class="logo">
-        <i class="fa-solid fa-mobile-screen-button"></i>
-        <span>PhonePilot <span style="color:var(--accent); font-size: 0.8rem; vertical-align: super;">AI</span></span>
-      </div>
-      <nav>
-        <button class="nav-btn active" onclick="switchTab('recommendations')">
-          <i class="fa-solid fa-wand-magic-sparkles"></i> Recommendation Engine
-        </button>
-        <button class="nav-btn" onclick="switchTab('catalog')">
-          <i class="fa-solid fa-list-ul"></i> Catalog
-        </button>
-        <button class="nav-btn" onclick="switchTab('compare')">
-          <i class="fa-solid fa-code-compare"></i> Compare <span class="badge" id="compare-count">0</span>
-        </button>
-      </nav>
-    </div>
-  </header>
+    <header>
+        <h1>✈️ PhonePilot</h1>
+        <p>Find your ideal smartphone match with customized filters and side-by-side specs comparison.</p>
+    </header>
 
-  <main>
-    <div id="recommendations-view" class="view-container active">
-      <div class="dashboard-grid">
-        <div class="filter-panel">
-          <h3 style="margin-bottom: 1rem; font-size: 1.1rem;"><i class="fa-solid fa-sliders"></i> User Preference Profile</h3>
-          
-          <div class="filter-group">
-            <label>Max Budget: <span id="budget-val">₹2,00,000</span></label>
-            <input type="range" id="budget-slider" min="5000" max="250000" step="2500" value="200000" oninput="updateFilters()">
-          </div>
-
-          <div class="filter-group">
-            <label>Brand Filter</label>
-            <select id="brand-select" onchange="updateFilters()">
-              <option value="ALL">All Brands</option>
-              <option value="Samsung">Samsung</option>
-              <option value="Apple">Apple</option>
-              <option value="Xiaomi">Xiaomi / Redmi</option>
-              <option value="POCO">POCO</option>
-              <option value="OnePlus">OnePlus</option>
-              <option value="Vivo">Vivo</option>
-              <option value="iQOO">iQOO</option>
-              <option value="OPPO">OPPO</option>
-              <option value="Realme">Realme</option>
-              <option value="Motorola">Motorola</option>
-              <option value="Google">Google</option>
-              <option value="Nothing">Nothing / CMF</option>
-              <option value="Tecno">Tecno</option>
-              <option value="Infinix">Infinix</option>
-              <option value="Lava">Lava</option>
-              <option value="Itel">Itel</option>
-            </select>
-          </div>
-
-          <hr style="border-color: var(--border-color); margin: 1rem 0;">
-
-          <h4 style="margin-bottom: 1rem; font-size: 0.95rem; color: var(--primary-accent);">Feature Priorities (1-10)</h4>
-
-          <div class="filter-group">
-            <label>Camera Quality: <span id="weight-cam-val">5</span></label>
-            <input type="range" id="weight-cam" min="1" max="10" value="5" oninput="updateFilters()">
-          </div>
-
-          <div class="filter-group">
-            <label>Gaming & Speed: <span id="weight-perf-val">5</span></label>
-            <input type="range" id="weight-perf" min="1" max="10" value="5" oninput="updateFilters()">
-          </div>
-
-          <div class="filter-group">
-            <label>Battery Life: <span id="weight-bat-val">5</span></label>
-            <input type="range" id="weight-bat" min="1" max="10" value="5" oninput="updateFilters()">
-          </div>
-
-          <div class="filter-group">
-            <label>Display Quality: <span id="weight-disp-val">5</span></label>
-            <input type="range" id="weight-disp" min="1" max="10" value="5" oninput="updateFilters()">
-          </div>
-
-          <button class="reset-btn" onclick="resetFilters()"><i class="fa-solid fa-rotate-left"></i> Reset Profile</button>
-        </div>
-
-        <div>
-          <div class="section-title">
-            <i class="fa-solid fa-bullseye" style="color: var(--accent);"></i>
-            <span>Top Matched Smartphones</span>
-          </div>
-          <div class="phones-grid" id="recommendations-grid"></div>
-        </div>
-      </div>
-    </div>
-
-    <div id="catalog-view" class="view-container">
-      <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
-        <input type="text" class="search-input" id="search-bar" placeholder="Search by model, chip, or brand..." style="flex: 2; min-width: 250px;" oninput="renderCatalog()">
-        <select class="sort-select" id="sort-select" style="flex: 1; min-width: 200px;" onchange="renderCatalog()">
-          <option value="recommended">Recommended</option>
-          <option value="newest">Newest First</option>
-          <option value="oldest">Oldest First</option>
-          <option value="price-asc">Price: Low → High</option>
-          <option value="price-desc">Price: High → Low</option>
-          <option value="name-asc">Name: A → Z</option>
-        </select>
-      </div>
-      <div class="phones-grid" id="catalog-grid"></div>
-    </div>
-
-    <div id="compare-view" class="view-container">
-      <div class="section-title">
-        <i class="fa-solid fa-code-compare" style="color: var(--primary-accent);"></i>
-        <span>Side-by-Side Comparison</span>
-      </div>
-      <div id="compare-content"></div>
-    </div>
-  </main>
-
-  <script>
-    // Helper function to parse dates into timestamps for sorting
-    function parseReleaseDate(dateStr) {
-      if (!dateStr || dateStr === "Upcoming") return 9999999999999;
-      if (dateStr.startsWith("Expected:")) {
-        const parts = dateStr.replace("Expected:", "").trim().split(" ");
-        if (parts.length === 2) {
-          return new Date(`${parts[0]} 1, ${parts[1]}`).getTime() || 9999999999998;
-        }
-        return 9999999999998;
-      }
-      return new Date(`${dateStr} 1`).getTime() || 0;
-    }
-
-    // -------------------------------------------------------------
-    // EXPANDED VERIFIED SMARTPHONE DATABASE
-    // -------------------------------------------------------------
-    const phoneDatabase = [
-      // SAMSUNG
-      { id: "sam-s26u", brand: "Samsung", name: "Galaxy S26 Ultra", price: 139999, releaseDate: "Expected: February 2026", processor: "Snapdragon 8 Elite Gen 2", display: '6.9" Dynamic AMOLED 2X 120Hz', camera: "200MP Main + 50MP UW + 50MP 5x + 50MP 3x", battery: "5000 mAh", scores: { cam: 10, perf: 10, bat: 9, disp: 10 } },
-      { id: "sam-s26p", brand: "Samsung", name: "Galaxy S26+", price: 104999, releaseDate: "Expected: February 2026", processor: "Snapdragon 8 Elite Gen 2", display: '6.7" Dynamic AMOLED 2X 120Hz', camera: "50MP Main + 50MP UW + 12MP 3x Telephoto", battery: "4900 mAh", scores: { cam: 9, perf: 10, bat: 9, disp: 10 } },
-      { id: "sam-s26", brand: "Samsung", name: "Galaxy S26", price: 84999, releaseDate: "Expected: February 2026", processor: "Exynos 2600 / Snapdragon 8 Elite Gen 2", display: '6.2" Dynamic AMOLED 2X 120Hz', camera: "50MP Main + 12MP UW + 10MP 3x Telephoto", battery: "4000 mAh", scores: { cam: 8, perf: 9, bat: 7, disp: 9 } },
-      { id: "sam-s25u", brand: "Samsung", name: "Galaxy S25 Ultra", price: 129999, releaseDate: "January 2025", processor: "Snapdragon 8 Elite", display: '6.8" Dynamic AMOLED 2X 120Hz', camera: "200MP Main + 50MP UW + 50MP 5x + 10MP 3x", battery: "5000 mAh", scores: { cam: 10, perf: 10, bat: 9, disp: 10 } },
-      { id: "sam-s25p", brand: "Samsung", name: "Galaxy S25+", price: 99999, releaseDate: "January 2025", processor: "Snapdragon 8 Elite", display: '6.7" Dynamic AMOLED 2X 120Hz', camera: "50MP Main + 12MP UW + 10MP 3x Telephoto", battery: "4900 mAh", scores: { cam: 9, perf: 10, bat: 8, disp: 9 } },
-      { id: "sam-s25", brand: "Samsung", name: "Galaxy S25", price: 79999, releaseDate: "January 2025", processor: "Snapdragon 8 Elite", display: '6.2" Dynamic AMOLED 2X 120Hz', camera: "50MP Main + 12MP UW + 10MP 3x Telephoto", battery: "4000 mAh", scores: { cam: 8, perf: 10, bat: 7, disp: 9 } },
-      { id: "sam-s25fe", brand: "Samsung", name: "Galaxy S25 FE", price: 62999, releaseDate: "Expected: October 2025", processor: "Exynos 2400", display: '6.7" Dynamic AMOLED 2X 120Hz', camera: "50MP Main + 12MP UW + 8MP 3x Telephoto", battery: "4700 mAh", scores: { cam: 8, perf: 8, bat: 8, disp: 9 } },
-      { id: "sam-s24u", brand: "Samsung", name: "Galaxy S24 Ultra", price: 109999, releaseDate: "January 2024", processor: "Snapdragon 8 Gen 3", display: '6.8" Dynamic AMOLED 2X 120Hz', camera: "200MP + 12MP UW + 50MP 5x + 10MP 3x", battery: "5000 mAh", scores: { cam: 9, perf: 9, bat: 9, disp: 10 } },
-      { id: "sam-s24fe", brand: "Samsung", name: "Galaxy S24 FE", price: 59999, releaseDate: "September 2024", processor: "Exynos 2400e", display: '6.7" Dynamic AMOLED 2X 120Hz', camera: "50MP Main + 12MP UW + 8MP 3x Telephoto", battery: "4700 mAh", scores: { cam: 8, perf: 8, bat: 7, disp: 8 } },
-      { id: "sam-zfold8u", brand: "Samsung", name: "Galaxy Z Fold 8 Ultra", price: 189999, releaseDate: "Expected: July 2026", processor: "Snapdragon 8 Elite Gen 2", display: '8.0" Dynamic AMOLED 120Hz Foldable', camera: "200MP Main + 50MP UW + 50MP Periscope", battery: "4600 mAh", scores: { cam: 10, perf: 10, bat: 8, disp: 10 } },
-      { id: "sam-zfold8", brand: "Samsung", name: "Galaxy Z Fold 8", price: 169999, releaseDate: "Expected: July 2026", processor: "Snapdragon 8 Elite Gen 2", display: '7.6" Dynamic AMOLED 120Hz Foldable', camera: "50MP Main + 12MP UW + 10MP 3x Telephoto", battery: "4500 mAh", scores: { cam: 9, perf: 10, bat: 7, disp: 10 } },
-      { id: "sam-zflip8", brand: "Samsung", name: "Galaxy Z Flip 8", price: 114999, releaseDate: "Expected: July 2026", processor: "Snapdragon 8 Elite Gen 2", display: '6.7" Dynamic AMOLED 120Hz Flip', camera: "50MP Main + 12MP Ultra-Wide", battery: "4200 mAh", scores: { cam: 8, perf: 10, bat: 7, disp: 9 } },
-      { id: "sam-zfold6", brand: "Samsung", name: "Galaxy Z Fold 6", price: 164999, releaseDate: "July 2024", processor: "Snapdragon 8 Gen 3", display: '7.6" Dynamic AMOLED 2X 120Hz Foldable', camera: "50MP Main + 12MP UW + 10MP 3x Telephoto", battery: "4400 mAh", scores: { cam: 8, perf: 9, bat: 7, disp: 10 } },
-      { id: "sam-zflip6", brand: "Samsung", name: "Galaxy Z Flip 6", price: 109999, releaseDate: "July 2024", processor: "Snapdragon 8 Gen 3", display: '6.7" Dynamic AMOLED 2X 120Hz Flip', camera: "50MP Main + 12MP Ultra-Wide", battery: "4000 mAh", scores: { cam: 8, perf: 9, bat: 7, disp: 9 } },
-      { id: "sam-f70p", brand: "Samsung", name: "Galaxy F70 Pro 5G", price: 29999, releaseDate: "Expected: November 2025", processor: "Exynos 1480", display: '6.7" Super AMOLED+ 120Hz', camera: "50MP OIS Main + 12MP UW + 5MP Macro", battery: "6000 mAh", scores: { cam: 7, perf: 7, bat: 9, disp: 8 } },
-      { id: "sam-f36", brand: "Samsung", name: "Galaxy F36 5G", price: 18999, releaseDate: "Expected: August 2025", processor: "Exynos 1380", display: '6.6" Super AMOLED 120Hz', camera: "50MP OIS + 8MP UW + 2MP Macro", battery: "6000 mAh", scores: { cam: 6, perf: 6, bat: 10, disp: 8 } },
-      { id: "sam-f17", brand: "Samsung", name: "Galaxy F17 5G", price: 12999, releaseDate: "Expected: September 2025", processor: "MediaTek Dimensity 6300", display: '6.5" FHD+ Super AMOLED 90Hz', camera: "50MP Main + 5MP UW + 2MP Macro", battery: "6000 mAh", scores: { cam: 5, perf: 5, bat: 10, disp: 7 } },
-      { id: "sam-a56", brand: "Samsung", name: "Galaxy A56 5G", price: 41999, releaseDate: "Expected: March 2025", processor: "Exynos 1580", display: '6.6" Super AMOLED 120Hz', camera: "50MP OIS + 12MP UW + 5MP Macro", battery: "5000 mAh", scores: { cam: 8, perf: 8, bat: 8, disp: 8 } },
-      { id: "sam-a55", brand: "Samsung", name: "Galaxy A55 5G", price: 38999, releaseDate: "March 2024", processor: "Exynos 1480", display: '6.6" Super AMOLED 120Hz', camera: "50MP Main + 12MP UW + 5MP Macro", battery: "5000 mAh", scores: { cam: 7, perf: 7, bat: 8, disp: 8 } },
-      { id: "sam-a36", brand: "Samsung", name: "Galaxy A36 5G", price: 29999, releaseDate: "Expected: March 2025", processor: "Snapdragon 7s Gen 2 / Exynos 1380", display: '6.6" Super AMOLED 120Hz', camera: "50MP Main + 8MP UW + 5MP Macro", battery: "5000 mAh", scores: { cam: 7, perf: 7, bat: 8, disp: 8 } },
-      { id: "sam-a17", brand: "Samsung", name: "Galaxy A17 5G", price: 14999, releaseDate: "Expected: April 2025", processor: "MediaTek Dimensity 6100+", display: '6.5" FHD+ Super AMOLED 90Hz', camera: "50MP Main + 5MP UW", battery: "5000 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 7 } },
-      { id: "sam-m56", brand: "Samsung", name: "Galaxy M56 5G", price: 26999, releaseDate: "Expected: May 2025", processor: "Exynos 1480", display: '6.7" Super AMOLED+ 120Hz', camera: "50MP Main + 8MP UW + 2MP Macro", battery: "5500 mAh", scores: { cam: 7, perf: 7, bat: 9, disp: 8 } },
-      { id: "sam-m36", brand: "Samsung", name: "Galaxy M36 5G", price: 19999, releaseDate: "Expected: June 2025", processor: "Exynos 1380", display: '6.6" Super AMOLED 120Hz', camera: "50MP Main + 8MP UW + 2MP Macro", battery: "6000 mAh", scores: { cam: 6, perf: 6, bat: 10, disp: 7 } },
-      { id: "sam-m17", brand: "Samsung", name: "Galaxy M17 5G", price: 12499, releaseDate: "Expected: July 2025", processor: "MediaTek Dimensity 6100+", display: '6.5" FHD+ LCD 90Hz', camera: "50MP Main + 2MP Depth", battery: "6000 mAh", scores: { cam: 5, perf: 5, bat: 10, disp: 6 } },
-
-      // APPLE
-      { id: "app-18pm", brand: "Apple", name: "iPhone 18 Pro Max", price: 159900, releaseDate: "Expected: September 2026", processor: "Apple A20 Pro", display: '6.9" Super Retina XDR OLED 120Hz ProMotion', camera: "48MP Main + 48MP UW + 48MP Telephoto", battery: "4800 mAh", scores: { cam: 10, perf: 10, bat: 10, disp: 10 } },
-      { id: "app-18p", brand: "Apple", name: "iPhone 18 Pro", price: 134900, releaseDate: "Expected: September 2026", processor: "Apple A20 Pro", display: '6.3" Super Retina XDR OLED 120Hz ProMotion', camera: "48MP Main + 48MP UW + 48MP Telephoto", battery: "3800 mAh", scores: { cam: 10, perf: 10, bat: 8, disp: 10 } },
-      { id: "app-17pm", brand: "Apple", name: "iPhone 17 Pro Max", price: 149900, releaseDate: "Expected: September 2025", processor: "Apple A19 Pro", display: '6.9" Super Retina XDR OLED 120Hz ProMotion', camera: "48MP Main + 48MP UW + 48MP 5x Periscope", battery: "4750 mAh", scores: { cam: 10, perf: 10, bat: 10, disp: 10 } },
-      { id: "app-17p", brand: "Apple", name: "iPhone 17 Pro", price: 124900, releaseDate: "Expected: September 2025", processor: "Apple A19 Pro", display: '6.3" Super Retina XDR OLED 120Hz ProMotion', camera: "48MP Main + 48MP UW + 48MP 5x Telephoto", battery: "3700 mAh", scores: { cam: 10, perf: 10, bat: 8, disp: 10 } },
-      { id: "app-17", brand: "Apple", name: "iPhone 17", price: 79900, releaseDate: "Expected: September 2025", processor: "Apple A19", display: '6.3" Super Retina XDR OLED 120Hz', camera: "48MP Main + 24MP UW", battery: "3600 mAh", scores: { cam: 9, perf: 9, bat: 8, disp: 9 } },
-      { id: "app-air", brand: "Apple", name: "iPhone Air", price: 89900, releaseDate: "Expected: September 2025", processor: "Apple A19", display: '6.6" Super Retina XDR OLED 120Hz Slim Design', camera: "48MP Main Camera", battery: "3200 mAh", scores: { cam: 8, perf: 9, bat: 6, disp: 9 } },
-      { id: "app-16pm", brand: "Apple", name: "iPhone 16 Pro Max", price: 144900, releaseDate: "September 2024", processor: "Apple A18 Pro", display: '6.9" Super Retina XDR OLED 120Hz', camera: "48MP Main + 48MP UW + 12MP 5x Periscope", battery: "4685 mAh", scores: { cam: 10, perf: 10, bat: 9, disp: 10 } },
-      { id: "app-16p", brand: "Apple", name: "iPhone 16 Pro", price: 119900, releaseDate: "September 2024", processor: "Apple A18 Pro", display: '6.3" Super Retina XDR OLED 120Hz', camera: "48MP Main + 48MP UW + 12MP 5x Telephoto", battery: "3582 mAh", scores: { cam: 10, perf: 10, bat: 7, disp: 10 } },
-      { id: "app-16plus", brand: "Apple", name: "iPhone 16 Plus", price: 89900, releaseDate: "September 2024", processor: "Apple A18", display: '6.7" Super Retina XDR OLED 60Hz', camera: "48MP Main + 12MP Ultra-Wide", battery: "4674 mAh", scores: { cam: 8, perf: 9, bat: 9, disp: 8 } },
-      { id: "app-16", brand: "Apple", name: "iPhone 16", price: 79900, releaseDate: "September 2024", processor: "Apple A18", display: '6.1" Super Retina XDR OLED 60Hz', camera: "48MP Main + 12MP Ultra-Wide", battery: "3561 mAh", scores: { cam: 8, perf: 9, bat: 7, disp: 8 } },
-      { id: "app-15", brand: "Apple", name: "iPhone 15", price: 65900, releaseDate: "September 2023", processor: "Apple A16 Bionic", display: '6.1" Super Retina XDR OLED 60Hz', camera: "48MP Main + 12MP Ultra-Wide", battery: "3349 mAh", scores: { cam: 8, perf: 8, bat: 7, disp: 8 } },
-      { id: "app-14", brand: "Apple", name: "iPhone 14", price: 56900, releaseDate: "September 2022", processor: "Apple A15 Bionic", display: '6.1" Super Retina XDR OLED 60Hz', camera: "12MP Main + 12MP Ultra-Wide", battery: "3279 mAh", scores: { cam: 7, perf: 7, bat: 6, disp: 7 } },
-      { id: "app-se3", brand: "Apple", name: "iPhone SE (3rd Gen)", price: 47600, releaseDate: "March 2022", processor: "Apple A15 Bionic", display: '4.7" Retina HD Display 60Hz', camera: "12MP Main Camera", battery: "2018 mAh", scores: { cam: 6, perf: 7, bat: 5, disp: 5 } },
-
-      // XIAOMI / REDMI
-      { id: "xi-17u", brand: "Xiaomi", name: "Xiaomi 17 Ultra", price: 109999, releaseDate: "Expected: February 2026", processor: "Snapdragon 8 Elite Gen 2", display: '6.73" 2K LTPO OLED 120Hz', camera: "200MP Leica Periscope + 50MP Main + 50MP UW", battery: "5500 mAh", scores: { cam: 10, perf: 10, bat: 9, disp: 10 } },
-      { id: "xi-17t", brand: "Xiaomi", name: "Xiaomi 17T", price: 54999, releaseDate: "Expected: September 2025", processor: "MediaTek Dimensity 9400", display: '6.67" 1.5K AMOLED 144Hz', camera: "50MP Leica Main + 50MP Tele + 12MP UW", battery: "5100 mAh", scores: { cam: 9, perf: 9, bat: 8, disp: 9 } },
-      { id: "xi-16p", brand: "Xiaomi", name: "Xiaomi 16 Pro", price: 84999, releaseDate: "Expected: October 2025", processor: "Snapdragon 8 Elite", display: '6.73" 2K OLED 120Hz', camera: "50MP Leica Main + 50MP Tele + 50MP UW", battery: "6100 mAh", scores: { cam: 10, perf: 10, bat: 10, disp: 10 } },
-      { id: "xi-14p", brand: "Xiaomi", name: "Xiaomi 14 Pro", price: 79999, releaseDate: "October 2023", processor: "Snapdragon 8 Gen 3", display: '6.73" 2K OLED 120Hz', camera: "50MP Leica Main + 50MP Tele + 50MP UW", battery: "4880 mAh", scores: { cam: 9, perf: 9, bat: 8, disp: 9 } },
-      { id: "xi-13tp", brand: "Xiaomi", name: "Xiaomi 13T Pro", price: 49999, releaseDate: "September 2023", processor: "MediaTek Dimensity 9200+", display: '6.67" 1.5K AMOLED 144Hz', camera: "50MP Leica Main + 50MP Tele + 12MP UW", battery: "5000 mAh", scores: { cam: 8, perf: 8, bat: 8, disp: 8 } },
-      { id: "red-note17pro", brand: "Xiaomi", name: "Redmi Note 17 Pro 5G", price: 27999, releaseDate: "Expected: January 2026", processor: "MediaTek Dimensity 7400", display: '6.67" 1.5K Curved AMOLED 120Hz', camera: "200MP OIS + 8MP UW + 2MP Macro", battery: "5500 mAh", scores: { cam: 8, perf: 7, bat: 9, disp: 8 } },
-      { id: "red-note17", brand: "Xiaomi", name: "Redmi Note 17 5G", price: 18999, releaseDate: "Expected: January 2026", processor: "Snapdragon 6 Gen 3", display: '6.67" FHD+ AMOLED 120Hz', camera: "108MP Main + 8MP UW", battery: "5100 mAh", scores: { cam: 7, perf: 6, bat: 8, disp: 7 } },
-      { id: "red-note15pro", brand: "Xiaomi", name: "Redmi Note 15 Pro 5G", price: 25999, releaseDate: "Expected: January 2025", processor: "MediaTek Dimensity 7300 Ultra", display: '6.67" 1.5K AMOLED 120Hz', camera: "50MP OIS + 8MP UW + 2MP Macro", battery: "5500 mAh", scores: { cam: 7, perf: 7, bat: 9, disp: 8 } },
-      { id: "red-note15", brand: "Xiaomi", name: "Redmi Note 15 5G", price: 16999, releaseDate: "Expected: January 2025", processor: "Snapdragon 6 Gen 1", display: '6.67" FHD+ AMOLED 120Hz', camera: "108MP Main + 2MP Depth", battery: "5000 mAh", scores: { cam: 6, perf: 6, bat: 8, disp: 7 } },
-      { id: "red-note14", brand: "Xiaomi", name: "Redmi Note 14 5G", price: 14999, releaseDate: "September 2024", processor: "MediaTek Dimensity 7025 Ultra", display: '6.67" FHD+ OLED 120Hz', camera: "50MP OIS + 2MP Depth", battery: "5110 mAh", scores: { cam: 6, perf: 6, bat: 8, disp: 7 } },
-      { id: "red-note13p+", brand: "Xiaomi", name: "Redmi Note 13 Pro+", price: 29999, releaseDate: "January 2024", processor: "MediaTek Dimensity 7200 Ultra", display: '6.67" 1.5K Curved AMOLED 120Hz', camera: "200MP OIS + 8MP UW + 2MP Macro", battery: "5000 mAh", scores: { cam: 8, perf: 7, bat: 8, disp: 8 } },
-      { id: "red-k100", brand: "Xiaomi", name: "Redmi K100", price: 39999, releaseDate: "Upcoming", processor: "Snapdragon 8 Gen 3", display: '6.67" 2K OLED 144Hz', camera: "50MP OIS + 8MP UW + 2MP Macro", battery: "5500 mAh", scores: { cam: 7, perf: 9, bat: 9, disp: 9 } },
-      { id: "red-k60u", brand: "Xiaomi", name: "Redmi K60 Ultra", price: 34999, releaseDate: "August 2023", processor: "MediaTek Dimensity 9200+", display: '6.67" 1.5K OLED 144Hz', camera: "50MP Main + 8MP UW + 2MP Macro", battery: "5000 mAh", scores: { cam: 7, perf: 9, bat: 8, disp: 8 } },
-      { id: "red-t5", brand: "Xiaomi", name: "Redmi Turbo 5", price: 24999, releaseDate: "Expected: April 2026", processor: "Snapdragon 8s Gen 4", display: '6.67" 1.5K OLED 120Hz', camera: "50MP Main + 8MP UW", battery: "5500 mAh", scores: { cam: 7, perf: 9, bat: 9, disp: 8 } },
-      { id: "red-16", brand: "Xiaomi", name: "Redmi 16", price: 11999, releaseDate: "Upcoming", processor: "MediaTek Helio G99", display: '6.79" FHD+ LCD 90Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 6 } },
-      { id: "red-15", brand: "Xiaomi", name: "Redmi 15 5G", price: 10999, releaseDate: "Expected: July 2025", processor: "Snapdragon 4 Gen 2", display: '6.79" FHD+ LCD 120Hz', camera: "50MP Main Camera", battery: "5030 mAh", scores: { cam: 4, perf: 5, bat: 8, disp: 6 } },
-      { id: "red-14c", brand: "Xiaomi", name: "Redmi 14C 5G", price: 9999, releaseDate: "August 2024", processor: "MediaTek Helio G81 Ultra", display: '6.88" HD+ LCD 120Hz', camera: "50MP Main Camera", battery: "5160 mAh", scores: { cam: 4, perf: 4, bat: 8, disp: 5 } },
-
-      // POCO
-      { id: "poc-x8pm", brand: "POCO", name: "POCO X8 Pro Max", price: 32999, releaseDate: "Expected: January 2026", processor: "MediaTek Dimensity 8400 Ultra", display: '6.67" 1.5K AMOLED 144Hz', camera: "50MP OIS + 8MP UW + 5MP Macro", battery: "5500 mAh", scores: { cam: 7, perf: 9, bat: 9, disp: 9 } },
-      { id: "poc-x8p", brand: "POCO", name: "POCO X8 Pro", price: 27999, releaseDate: "Expected: January 2026", processor: "MediaTek Dimensity 8400", display: '6.67" 1.5K AMOLED 120Hz', camera: "50MP OIS + 8MP UW", battery: "5000 mAh", scores: { cam: 7, perf: 8, bat: 8, disp: 8 } },
-      { id: "poc-x8pwr", brand: "POCO", name: "POCO X8 Power 5G", price: 22999, releaseDate: "Expected: March 2026", processor: "Snapdragon 7s Gen 3", display: '6.67" FHD+ AMOLED 120Hz', camera: "50MP Main + 8MP UW", battery: "6500 mAh", scores: { cam: 6, perf: 7, bat: 10, disp: 8 } },
-      { id: "poc-x8", brand: "POCO", name: "POCO X8 5G", price: 19999, releaseDate: "Expected: February 2026", processor: "Snapdragon 6 Gen 3", display: '6.67" FHD+ AMOLED 120Hz', camera: "50MP Main + 8MP UW", battery: "5100 mAh", scores: { cam: 6, perf: 6, bat: 8, disp: 7 } },
-      { id: "poc-x7p", brand: "POCO", name: "POCO X7 Pro", price: 25999, releaseDate: "Expected: January 2025", processor: "MediaTek Dimensity 8300 Ultra", display: '6.67" 1.5K AMOLED 120Hz', camera: "64MP Main + 8MP UW + 2MP Macro", battery: "5000 mAh", scores: { cam: 6, perf: 8, bat: 8, disp: 8 } },
-      { id: "poc-x7", brand: "POCO", name: "POCO X7 5G", price: 17999, releaseDate: "Expected: January 2025", processor: "MediaTek Dimensity 7300 Ultra", display: '6.67" FHD+ OLED 120Hz', camera: "50MP Main + 8MP UW", battery: "5000 mAh", scores: { cam: 6, perf: 7, bat: 8, disp: 7 } },
-      { id: "poc-m8p", brand: "POCO", name: "POCO M8 Pro 5G", price: 16999, releaseDate: "Expected: May 2026", processor: "MediaTek Dimensity 6300", display: '6.67" FHD+ AMOLED 120Hz', camera: "50MP Main + 8MP UW", battery: "5000 mAh", scores: { cam: 6, perf: 6, bat: 8, disp: 7 } },
-      { id: "poc-m8", brand: "POCO", name: "POCO M8 5G", price: 12999, releaseDate: "Expected: May 2026", processor: "Snapdragon 4 Gen 2", display: '6.79" FHD+ LCD 120Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 6 } },
-      { id: "poc-m8x", brand: "POCO", name: "POCO M8x 5G", price: 10999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 6100+", display: '6.7" HD+ LCD 90Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 4, perf: 5, bat: 8, disp: 5 } },
-      { id: "poc-f8u", brand: "POCO", name: "POCO F8 Ultra", price: 44999, releaseDate: "Upcoming", processor: "Snapdragon 8 Elite", display: '6.67" 2K OLED 144Hz', camera: "50MP OIS + 50MP Tele + 8MP UW", battery: "5500 mAh", scores: { cam: 8, perf: 10, bat: 9, disp: 9 } },
-      { id: "poc-f8p", brand: "POCO", name: "POCO F8 Pro", price: 36999, releaseDate: "Upcoming", processor: "Snapdragon 8 Gen 3", display: '6.67" 2K AMOLED 120Hz', camera: "50MP OIS + 8MP UW + 2MP Macro", battery: "5000 mAh", scores: { cam: 7, perf: 9, bat: 8, disp: 8 } },
-      { id: "poc-f7", brand: "POCO", name: "POCO F7", price: 29999, releaseDate: "Expected: May 2025", processor: "Snapdragon 8s Gen 3", display: '6.67" 1.5K AMOLED 120Hz', camera: "50MP Main + 8MP Ultra-Wide", battery: "5000 mAh", scores: { cam: 7, perf: 9, bat: 8, disp: 8 } },
-      { id: "poc-c85x", brand: "POCO", name: "POCO C85X", price: 8999, releaseDate: "Upcoming", processor: "MediaTek Helio G85", display: '6.71" HD+ LCD 90Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 4, perf: 4, bat: 8, disp: 5 } },
-      { id: "poc-c85", brand: "POCO", name: "POCO C85 5G", price: 9999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 6100+", display: '6.74" HD+ LCD 90Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 4, perf: 4, bat: 8, disp: 5 } },
-      { id: "poc-c81x", brand: "POCO", name: "POCO C81x", price: 7999, releaseDate: "Upcoming", processor: "MediaTek Helio G36", display: '6.71" HD+ LCD 90Hz', camera: "13MP Main Camera", battery: "5000 mAh", scores: { cam: 3, perf: 3, bat: 8, disp: 4 } },
-      { id: "poc-c75", brand: "POCO", name: "POCO C75", price: 8499, releaseDate: "October 2024", processor: "MediaTek Helio G81 Ultra", display: '6.88" HD+ LCD 120Hz', camera: "50MP Main Camera", battery: "5160 mAh", scores: { cam: 4, perf: 4, bat: 8, disp: 5 } },
-
-      // ONEPLUS
-      { id: "op-15", brand: "OnePlus", name: "OnePlus 15", price: 74999, releaseDate: "Expected: January 2026", processor: "Snapdragon 8 Elite Gen 2", display: '6.82" 2K OLED 120Hz', camera: "50MP Sony Main + 50MP UW + 50MP Telephoto", battery: "6200 mAh", scores: { cam: 10, perf: 10, bat: 10, disp: 10 } },
-      { id: "op-15r", brand: "OnePlus", name: "OnePlus 15R", price: 44999, releaseDate: "Expected: January 2026", processor: "Snapdragon 8 Gen 3", display: '6.78" 1.5K OLED 120Hz', camera: "50MP Main + 8MP UW + 50MP Telephoto", battery: "6000 mAh", scores: { cam: 8, perf: 9, bat: 10, disp: 9 } },
-      { id: "op-14", brand: "OnePlus", name: "OnePlus 14", price: 69999, releaseDate: "Expected: January 2025", processor: "Snapdragon 8 Elite", display: '6.82" 2K OLED 120Hz', camera: "50MP Sony Main + 50MP UW + 50MP 3x Periscope", battery: "6000 mAh", scores: { cam: 9, perf: 10, bat: 10, disp: 10 } },
-      { id: "op-13", brand: "OnePlus", name: "OnePlus 13", price: 69999, releaseDate: "October 2024", processor: "Snapdragon 8 Elite", display: '6.82" 2K Quad-Curved AMOLED 120Hz', camera: "50MP Sony LYT-808 + 50MP UW + 50MP 3x Periscope", battery: "6000 mAh", scores: { cam: 9, perf: 10, bat: 10, disp: 10 } },
-      { id: "op-13r", brand: "OnePlus", name: "OnePlus 13R", price: 42999, releaseDate: "January 2025", processor: "Snapdragon 8 Gen 3", display: '6.78" 1.5K AMOLED 120Hz', camera: "50MP Main + 8MP UW + 50MP Telephoto", battery: "6000 mAh", scores: { cam: 8, perf: 9, bat: 10, disp: 9 } },
-      { id: "op-13s", brand: "OnePlus", name: "OnePlus 13s", price: 49999, releaseDate: "Upcoming", processor: "Snapdragon 8s Gen 3", display: '6.7" 1.5K AMOLED 120Hz', camera: "50MP Main + 50MP Telephoto + 8MP UW", battery: "5500 mAh", scores: { cam: 8, perf: 8, bat: 9, disp: 9 } },
-      { id: "op-nord6", brand: "OnePlus", name: "OnePlus Nord 6", price: 32999, releaseDate: "Expected: July 2026", processor: "Snapdragon 7+ Gen 4", display: '6.74" 1.5K AMOLED 120Hz', camera: "50MP Main + 8MP Ultra-Wide", battery: "5800 mAh", scores: { cam: 7, perf: 8, bat: 9, disp: 8 } },
-      { id: "op-nord5", brand: "OnePlus", name: "OnePlus Nord 5 5G", price: 30999, releaseDate: "Expected: July 2025", processor: "Snapdragon 7+ Gen 3", display: '6.74" 1.5K AMOLED 120Hz', camera: "50MP Main + 8MP Ultra-Wide", battery: "5500 mAh", scores: { cam: 7, perf: 8, bat: 9, disp: 8 } },
-      { id: "op-nordce6", brand: "OnePlus", name: "OnePlus Nord CE 6 5G", price: 25999, releaseDate: "Expected: April 2026", processor: "Snapdragon 7 Gen 3", display: '6.7" FHD+ AMOLED 120Hz', camera: "50MP Main + 8MP Ultra-Wide", battery: "5500 mAh", scores: { cam: 6, perf: 7, bat: 9, disp: 7 } },
-      { id: "op-n6", brand: "OnePlus", name: "OnePlus N6 5G", price: 18999, releaseDate: "Upcoming", processor: "Snapdragon 695", display: '6.7" FHD+ LCD 120Hz', camera: "50MP Main + 2MP Depth", battery: "5000 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 6 } },
-      { id: "op-n6x", brand: "OnePlus", name: "OnePlus N6x 5G", price: 15999, releaseDate: "Upcoming", processor: "Snapdragon 695", display: '6.5" FHD+ LCD 90Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 6 } },
-      { id: "op-open2", brand: "OnePlus", name: "OnePlus Open 2", price: 149999, releaseDate: "Expected: Q2 2025", processor: "Snapdragon 8 Elite", display: '7.8" Fluid AMOLED 120Hz Foldable', camera: "50MP Main + 50MP UW + 64MP Telephoto", battery: "5000 mAh", scores: { cam: 9, perf: 10, bat: 8, disp: 10 } },
-
-      // VIVO
-      { id: "viv-x300u", brand: "Vivo", name: "Vivo X300 Ultra", price: 109999, releaseDate: "Expected: May 2026", processor: "Snapdragon 8 Elite Gen 2", display: '6.78" Quad-Curved AMOLED 120Hz', camera: "200MP Zeiss Periscope + 50MP Main + 50MP UW", battery: "6000 mAh", scores: { cam: 10, perf: 10, bat: 10, disp: 10 } },
-      { id: "viv-x300fe", brand: "Vivo", name: "Vivo X300 FE", price: 54999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 9300+", display: '6.67" AMOLED 120Hz', camera: "50MP Zeiss Main + 50MP Telephoto", battery: "5500 mAh", scores: { cam: 9, perf: 9, bat: 9, disp: 9 } },
-      { id: "viv-x200fe", brand: "Vivo", name: "Vivo X200 FE", price: 49999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 9300", display: '6.67" AMOLED 120Hz', camera: "50MP Zeiss Main + 50MP Telephoto", battery: "5400 mAh", scores: { cam: 9, perf: 9, bat: 8, disp: 8 } },
-      { id: "viv-x100p", brand: "Vivo", name: "Vivo X100 Pro", price: 89999, releaseDate: "November 2023", processor: "MediaTek Dimensity 9300", display: '6.78" AMOLED 120Hz', camera: "50MP Zeiss Main + 50MP Tele + 50MP UW", battery: "5400 mAh", scores: { cam: 10, perf: 9, bat: 8, disp: 9 } },
-      { id: "viv-x90", brand: "Vivo", name: "Vivo X90", price: 59999, releaseDate: "November 2022", processor: "MediaTek Dimensity 9200", display: '6.78" AMOLED 120Hz', camera: "50MP Zeiss Main + 12MP Tele + 12MP UW", battery: "4810 mAh", scores: { cam: 8, perf: 8, bat: 7, disp: 8 } },
-      { id: "viv-v80", brand: "Vivo", name: "Vivo V80 5G", price: 39999, releaseDate: "Expected: August 2026", processor: "Snapdragon 7 Gen 4", display: '6.78" 1.5K Curved AMOLED 120Hz', camera: "50MP Zeiss Main + 50MP UW", battery: "5500 mAh", scores: { cam: 8, perf: 7, bat: 9, disp: 8 } },
-      { id: "viv-v80lite", brand: "Vivo", name: "Vivo V80 Lite 5G", price: 27999, releaseDate: "Expected: August 2026", processor: "MediaTek Dimensity 7200", display: '6.67" AMOLED 120Hz', camera: "50MP Main + 8MP UW", battery: "5000 mAh", scores: { cam: 7, perf: 6, bat: 8, disp: 7 } },
-      { id: "viv-v70", brand: "Vivo", name: "Vivo V70", price: 36999, releaseDate: "Expected: February 2026", processor: "Snapdragon 7 Gen 3", display: '6.78" 1.5K Curved AMOLED 120Hz', camera: "50MP Zeiss Main + 50MP Telephoto", battery: "5500 mAh", scores: { cam: 8, perf: 7, bat: 9, disp: 8 } },
-      { id: "viv-v50", brand: "Vivo", name: "Vivo V50", price: 34999, releaseDate: "Expected: February 2025", processor: "Snapdragon 7 Gen 3", display: '6.78" 1.5K Curved AMOLED 120Hz', camera: "50MP Zeiss Main + 50MP UW", battery: "5500 mAh", scores: { cam: 8, perf: 7, bat: 9, disp: 8 } },
-      { id: "viv-v29p", brand: "Vivo", name: "Vivo V29 Pro", price: 39999, releaseDate: "October 2023", processor: "MediaTek Dimensity 8200", display: '6.78" 3D Curved AMOLED 120Hz', camera: "50MP Main + 12MP Portrait + 8MP UW", battery: "4600 mAh", scores: { cam: 8, perf: 7, bat: 7, disp: 8 } },
-      { id: "viv-t5p", brand: "Vivo", name: "Vivo T5 Pro", price: 26999, releaseDate: "Expected: August 2026", processor: "Snapdragon 7 Gen 3", display: '6.77" Curved AMOLED 120Hz', camera: "50MP Sony IMX882 OIS + 8MP UW", battery: "5500 mAh", scores: { cam: 7, perf: 7, bat: 9, disp: 8 } },
-      { id: "viv-t5u", brand: "Vivo", name: "Vivo T5 Ultra", price: 31999, releaseDate: "Expected: September 2026", processor: "MediaTek Dimensity 8300", display: '6.78" Curved AMOLED 120Hz', camera: "50MP OIS + 8MP UW + 2MP Macro", battery: "5500 mAh", scores: { cam: 7, perf: 8, bat: 9, disp: 8 } },
-      { id: "viv-t5x", brand: "Vivo", name: "Vivo T5x 5G", price: 13999, releaseDate: "Expected: April 2026", processor: "Snapdragon 6 Gen 1", display: '6.72" FHD+ 120Hz LCD', camera: "50MP Main + 2MP Depth", battery: "6000 mAh", scores: { cam: 5, perf: 6, bat: 10, disp: 6 } },
-      { id: "viv-t5", brand: "Vivo", name: "Vivo T5 5G", price: 18999, releaseDate: "Expected: April 2026", processor: "MediaTek Dimensity 7200", display: '6.67" AMOLED 120Hz', camera: "50MP Sony OIS + 2MP Depth", battery: "5000 mAh", scores: { cam: 6, perf: 7, bat: 8, disp: 7 } },
-      { id: "viv-t4p", brand: "Vivo", name: "Vivo T4 Pro 5G", price: 24999, releaseDate: "Expected: August 2025", processor: "Snapdragon 7 Gen 3", display: '6.77" Curved AMOLED 120Hz', camera: "50MP OIS + 8MP UW", battery: "5500 mAh", scores: { cam: 7, perf: 7, bat: 9, disp: 8 } },
-      { id: "viv-t4x", brand: "Vivo", name: "Vivo T4x 5G", price: 12999, releaseDate: "Expected: April 2025", processor: "Snapdragon 6 Gen 1", display: '6.72" FHD+ 120Hz LCD', camera: "50MP Main + 2MP Depth", battery: "6000 mAh", scores: { cam: 5, perf: 6, bat: 10, disp: 6 } },
-      { id: "viv-t4r", brand: "Vivo", name: "Vivo T4R 5G", price: 15999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 6300", display: '6.67" AMOLED 120Hz', camera: "50MP Main + 2MP Depth", battery: "5000 mAh", scores: { cam: 5, perf: 6, bat: 8, disp: 7 } },
-      { id: "viv-t2p", brand: "Vivo", name: "Vivo T2 Pro 5G", price: 21999, releaseDate: "September 2023", processor: "MediaTek Dimensity 7200", display: '6.78" Curved AMOLED 120Hz', camera: "64MP OIS + 2MP Depth", battery: "4600 mAh", scores: { cam: 6, perf: 7, bat: 7, disp: 8 } },
-      { id: "viv-s2", brand: "Vivo", name: "Vivo S2 5G", price: 29999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 8200", display: '6.78" AMOLED 120Hz', camera: "50MP OIS + 8MP UW", battery: "5000 mAh", scores: { cam: 7, perf: 7, bat: 8, disp: 8 } },
-      { id: "viv-y600p", brand: "Vivo", name: "Vivo Y600 Pro", price: 19999, releaseDate: "Upcoming", processor: "Snapdragon 6 Gen 1", display: '6.67" AMOLED 120Hz', camera: "50MP Main + 2MP Depth", battery: "6000 mAh", scores: { cam: 6, perf: 6, bat: 10, disp: 7 } },
-      { id: "viv-y300", brand: "Vivo", name: "Vivo Y300 5G", price: 21999, releaseDate: "November 2024", processor: "Snapdragon 4 Gen 2", display: '6.67" AMOLED 120Hz', camera: "50MP Sony Main + 2MP Bokeh", battery: "5000 mAh", scores: { cam: 6, perf: 5, bat: 8, disp: 7 } },
-      { id: "viv-y200", brand: "Vivo", name: "Vivo Y200 5G", price: 16199, releaseDate: "October 2023", processor: "Snapdragon 4 Gen 1", display: '6.67" AMOLED 120Hz', camera: "64MP Smart Aura Light + 2MP Depth", battery: "4800 mAh", scores: { cam: 5, perf: 5, bat: 7, disp: 7 } },
-      { id: "viv-y31t", brand: "Vivo", name: "Vivo Y31T 5G", price: 14999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 6100+", display: '6.56" LCD 90Hz', camera: "50MP Main + 2MP Depth", battery: "5000 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 6 } },
-
-      // iQOO
-      { id: "iq-15p", brand: "iQOO", name: "iQOO 15 Pro", price: 64999, releaseDate: "Expected: November 2025", processor: "Snapdragon 8 Elite", display: '6.82" 2K 144Hz AMOLED', camera: "50MP Main + 50MP UW + 50MP Telephoto", battery: "6100 mAh", scores: { cam: 9, perf: 10, bat: 10, disp: 10 } },
-      { id: "iq-15", brand: "iQOO", name: "iQOO 15", price: 54999, releaseDate: "Expected: November 2025", processor: "Snapdragon 8 Elite", display: '6.78" 1.5K 144Hz AMOLED', camera: "50MP Main + 50MP UW + 50MP Telephoto", battery: "6000 mAh", scores: { cam: 9, perf: 10, bat: 10, disp: 10 } },
-      { id: "iq-neo10r", brand: "iQOO", name: "iQOO Neo 10R", price: 29999, releaseDate: "Expected: March 2025", processor: "Snapdragon 8s Gen 3", display: '6.78" 1.5K 144Hz AMOLED', camera: "50MP Sony Main + 8MP UW", battery: "6000 mAh", scores: { cam: 7, perf: 9, bat: 10, disp: 9 } },
-      { id: "iq-neo10", brand: "iQOO", name: "iQOO Neo 10", price: 34999, releaseDate: "Expected: November 2024", processor: "Snapdragon 8 Gen 3", display: '6.78" 1.5K 144Hz AMOLED', camera: "50MP Sony IMX921 + 8MP UW", battery: "6100 mAh", scores: { cam: 8, perf: 9, bat: 10, disp: 9 } },
-      { id: "iq-z11", brand: "iQOO", name: "iQOO Z11 5G", price: 21999, releaseDate: "Expected: April 2026", processor: "Snapdragon 7 Gen 3", display: '6.7" AMOLED 120Hz', camera: "50MP Sony OIS + 2MP Depth", battery: "6000 mAh", scores: { cam: 6, perf: 8, bat: 10, disp: 8 } },
-      { id: "iq-z11t", brand: "iQOO", name: "iQOO Z11 Turbo", price: 27999, releaseDate: "Expected: April 2026", processor: "Snapdragon 8s Gen 4", display: '6.78" 1.5K 144Hz OLED', camera: "50MP OIS + 8MP UW", battery: "6400 mAh", scores: { cam: 7, perf: 9, bat: 10, disp: 9 } },
-      { id: "iq-z10r", brand: "iQOO", name: "iQOO Z10R", price: 17999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 7200", display: '6.67" AMOLED 120Hz', camera: "50MP Main + 2MP Depth", battery: "5500 mAh", scores: { cam: 6, perf: 7, bat: 9, disp: 7 } },
-
-      // OPPO
-      { id: "opp-fx9u", brand: "OPPO", name: "OPPO Find X9 Ultra", price: 109999, releaseDate: "Expected: March 2026", processor: "Snapdragon 8 Elite Gen 2", display: '6.82" 2K LTPO OLED 120Hz', camera: "50MP Quad Camera Dual Periscope Hasselblad", battery: "6000 mAh", scores: { cam: 10, perf: 10, bat: 10, disp: 10 } },
-      { id: "opp-fx7pu", brand: "OPPO", name: "OPPO Find X7 Ultra", price: 89999, releaseDate: "January 2024", processor: "Snapdragon 8 Gen 3", display: '6.82" 2K LTPO OLED 120Hz', camera: "50MP Quad Main Hasselblad Dual Periscope", battery: "5000 mAh", scores: { cam: 10, perf: 9, bat: 8, disp: 10 } },
-      { id: "opp-fn3f", brand: "OPPO", name: "OPPO Find N3 Flip", price: 94999, releaseDate: "October 2023", processor: "MediaTek Dimensity 9200", display: '6.8" FHD+ AMOLED 120Hz Foldable', camera: "50MP Main + 32MP Tele + 48MP UW Hasselblad", battery: "4300 mAh", scores: { cam: 9, perf: 8, bat: 7, disp: 9 } },
-      { id: "opp-r16p", brand: "OPPO", name: "OPPO Reno16 Pro 5G", price: 49999, releaseDate: "Expected: May 2026", processor: "MediaTek Dimensity 8400", display: '6.7" 1.5K Curved OLED 120Hz', camera: "50MP Sony Main + 50MP Tele + 8MP UW", battery: "5500 mAh", scores: { cam: 9, perf: 8, bat: 9, disp: 9 } },
-      { id: "opp-r16c", brand: "OPPO", name: "OPPO Reno 16c", price: 29999, releaseDate: "Upcoming", processor: "Snapdragon 7 Gen 3", display: '6.67" OLED 120Hz', camera: "50MP Main + 8MP UW", battery: "5000 mAh", scores: { cam: 7, perf: 7, bat: 8, disp: 8 } },
-      { id: "opp-r14", brand: "OPPO", name: "OPPO Reno 14", price: 37999, releaseDate: "Expected: May 2025", processor: "MediaTek Dimensity 8300", display: '6.7" Curved OLED 120Hz', camera: "50MP Main + 50MP Tele + 8MP UW", battery: "5000 mAh", scores: { cam: 8, perf: 8, bat: 8, disp: 8 } },
-      { id: "opp-r13f", brand: "OPPO", name: "OPPO Reno 13F 5G", price: 24999, releaseDate: "Expected: January 2025", processor: "Snapdragon 6s Gen 3", display: '6.67" AMOLED 120Hz', camera: "50MP Main + 8MP UW + 2MP Macro", battery: "5000 mAh", scores: { cam: 7, perf: 6, bat: 8, disp: 8 } },
-      { id: "opp-k15p", brand: "OPPO", name: "OPPO K15 Pro", price: 26999, releaseDate: "Upcoming", processor: "Snapdragon 8s Gen 3", display: '6.67" OLED 120Hz', camera: "50MP Main + 8MP UW", battery: "5500 mAh", scores: { cam: 7, perf: 9, bat: 9, disp: 8 } },
-      { id: "opp-k14x", brand: "OPPO", name: "OPPO K14x 5G", price: 12999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 6100+", display: '6.56" LCD 90Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 6 } },
-      { id: "opp-k13tp", brand: "OPPO", name: "OPPO K13 Turbo Pro", price: 22999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 8300", display: '6.67" OLED 120Hz', camera: "50MP Main + 8MP UW", battery: "5500 mAh", scores: { cam: 6, perf: 8, bat: 9, disp: 8 } },
-      { id: "opp-k13", brand: "OPPO", name: "OPPO K13 5G", price: 17999, releaseDate: "Upcoming", processor: "Snapdragon 6 Gen 1", display: '6.7" LCD 120Hz', camera: "50MP Main + 2MP Depth", battery: "5000 mAh", scores: { cam: 5, perf: 6, bat: 8, disp: 6 } },
-      { id: "opp-k13x", brand: "OPPO", name: "OPPO K13x 5G", price: 12999, releaseDate: "Expected: June 2025", processor: "MediaTek Dimensity 6300", display: '6.67" LCD 120Hz', camera: "32MP Main Camera", battery: "5100 mAh", scores: { cam: 4, perf: 5, bat: 8, disp: 6 } },
-      { id: "opp-a6s", brand: "OPPO", name: "OPPO A6s 5G", price: 15999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 6100+", display: '6.56" LCD 90Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 6 } },
-      { id: "opp-a3p", brand: "OPPO", name: "OPPO A3 Pro 5G", price: 17999, releaseDate: "June 2024", processor: "MediaTek Dimensity 6300", display: '6.67" LCD 120Hz Splash Touch', camera: "50MP Main Camera", battery: "5100 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 6 } },
-
-      // REALME
-      { id: "rm-gt7p", brand: "Realme", name: "Realme GT 7 Pro", price: 59999, releaseDate: "November 2024", processor: "Snapdragon 8 Elite", display: '6.78" Eco2 OLED Plus 120Hz', camera: "50MP Main + 50MP 3x Periscope + 8MP UW", battery: "6500 mAh", scores: { cam: 9, perf: 10, bat: 10, disp: 10 } },
-      { id: "rm-gt7", brand: "Realme", name: "Realme GT 7", price: 44999, releaseDate: "Expected: April 2025", processor: "MediaTek Dimensity 9400", display: '6.78" OLED 120Hz', camera: "50MP Main + 50MP Tele + 8MP UW", battery: "6000 mAh", scores: { cam: 8, perf: 10, bat: 10, disp: 9 } },
-      { id: "rm-gt6", brand: "Realme", name: "Realme GT 6", price: 40999, releaseDate: "June 2024", processor: "Snapdragon 8s Gen 3", display: '6.78" 1.5K LTPO AMOLED 120Hz', camera: "50MP Sony LYT-808 + 50MP Tele + 8MP UW", battery: "5500 mAh", scores: { cam: 8, perf: 9, bat: 9, disp: 9 } },
-      { id: "rm-16p+", brand: "Realme", name: "Realme 16 Pro+ 5G", price: 34999, releaseDate: "Expected: January 2026", processor: "Snapdragon 7s Gen 3", display: '6.7" Curved OLED 120Hz', camera: "50MP Main + 50MP Periscope + 8MP UW", battery: "5500 mAh", scores: { cam: 9, perf: 7, bat: 9, disp: 8 } },
-      { id: "rm-16", brand: "Realme", name: "Realme 16 5G", price: 19999, releaseDate: "Expected: January 2026", processor: "MediaTek Dimensity 7300", display: '6.67" OLED 120Hz', camera: "50MP OIS Main Sensor", battery: "5000 mAh", scores: { cam: 6, perf: 7, bat: 8, disp: 7 } },
-      { id: "rm-16x", brand: "Realme", name: "Realme 16x", price: 14999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 6300", display: '6.72" LCD 120Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 6 } },
-      { id: "rm-15", brand: "Realme", name: "Realme 15", price: 18999, releaseDate: "Expected: July 2025", processor: "MediaTek Dimensity 7300", display: '6.67" OLED 120Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 6, perf: 7, bat: 8, disp: 7 } },
-      { id: "rm-p4p", brand: "Realme", name: "Realme P4 Pro 5G", price: 23999, releaseDate: "Expected: April 2026", processor: "Snapdragon 7s Gen 3", display: '6.7" Curved OLED 120Hz', camera: "50MP Sony OIS + 8MP UW", battery: "5500 mAh", scores: { cam: 7, perf: 7, bat: 9, disp: 8 } },
-      { id: "rm-p4pwr", brand: "Realme", name: "Realme P4 Power 5G", price: 19999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 7300", display: '6.67" OLED 120Hz', camera: "50MP Main Camera", battery: "6000 mAh", scores: { cam: 6, perf: 7, bat: 10, disp: 7 } },
-      { id: "rm-p4", brand: "Realme", name: "Realme P4 5G", price: 16999, releaseDate: "Expected: April 2026", processor: "MediaTek Dimensity 7050", display: '6.67" OLED 120Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 6, perf: 6, bat: 8, disp: 7 } },
-      { id: "rm-p4x", brand: "Realme", name: "Realme P4x 5G", price: 13999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 6300", display: '6.72" LCD 120Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 6 } },
-      { id: "rm-p4s", brand: "Realme", name: "Realme P4s 5G", price: 11999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 6100+", display: '6.72" LCD 120Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 6 } },
-      { id: "rm-p4r", brand: "Realme", name: "Realme P4R 5G", price: 15999, releaseDate: "Upcoming", processor: "Snapdragon 6 Gen 1", display: '6.67" OLED 120Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 6, perf: 6, bat: 8, disp: 7 } },
-      { id: "rm-n100l", brand: "Realme", name: "Realme Narzo 100 Lite 5G", price: 10999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 6100+", display: '6.56" LCD 90Hz', camera: "13MP Main Camera", battery: "5000 mAh", scores: { cam: 4, perf: 5, bat: 8, disp: 5 } },
-      { id: "rm-n90", brand: "Realme", name: "Realme Narzo 90 5G", price: 13999, releaseDate: "Expected: May 2026", processor: "MediaTek Dimensity 6300", display: '6.72" LCD 120Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 6 } },
-      { id: "rm-c100i", brand: "Realme", name: "Realme C100i", price: 8999, releaseDate: "Upcoming", processor: "UNISOC T612", display: '6.74" LCD 90Hz', camera: "13MP Main Camera", battery: "5000 mAh", scores: { cam: 3, perf: 4, bat: 8, disp: 5 } },
-      { id: "rm-c83", brand: "Realme", name: "Realme C83 5G", price: 9999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 6100+", display: '6.74" LCD 90Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 4, perf: 5, bat: 8, disp: 5 } },
-
-      // MOTOROLA
-      { id: "mot-e70f", brand: "Motorola", name: "Motorola Edge 70 Fusion", price: 25999, releaseDate: "Expected: May 2026", processor: "Snapdragon 7s Gen 3", display: '6.7" FHD+ pOLED 144Hz', camera: "50MP Sony LYT Main + 13MP UW", battery: "5200 mAh", scores: { cam: 7, perf: 7, bat: 9, disp: 8 } },
-      { id: "mot-e70p", brand: "Motorola", name: "Motorola Edge 70 Pro", price: 35999, releaseDate: "Expected: May 2026", processor: "Snapdragon 8s Gen 4", display: '6.7" 1.5K pOLED 144Hz', camera: "50MP Main + 50MP UW + 10MP 3x Telephoto", battery: "5000 mAh", scores: { cam: 8, perf: 9, bat: 8, disp: 9 } },
-      { id: "mot-e70", brand: "Motorola", name: "Motorola Edge 70 5G", price: 29999, releaseDate: "Expected: May 2026", processor: "Snapdragon 7 Gen 4", display: '6.7" 1.5K pOLED 144Hz', camera: "50MP Main + 13MP UW", battery: "5000 mAh", scores: { cam: 7, perf: 8, bat: 8, disp: 9 } },
-      { id: "mot-e60p", brand: "Motorola", name: "Motorola Edge 60 Pro", price: 33999, releaseDate: "Expected: April 2025", processor: "Snapdragon 7 Gen 3", display: '6.7" 1.5K pOLED 144Hz', camera: "50MP Main + 13MP UW + 10MP Telephoto", battery: "4800 mAh", scores: { cam: 8, perf: 7, bat: 8, disp: 9 } },
-      { id: "mot-e60f", brand: "Motorola", name: "Motorola Edge 60 Fusion", price: 23999, releaseDate: "Expected: April 2025", processor: "Snapdragon 7s Gen 2", display: '6.7" FHD+ pOLED 144Hz', camera: "50MP Main + 13MP UW", battery: "5000 mAh", scores: { cam: 7, perf: 6, bat: 8, disp: 8 } },
-      { id: "mot-e60s", brand: "Motorola", name: "Motorola Edge 60 Stylus", price: 27999, releaseDate: "Upcoming", processor: "Snapdragon 6 Gen 1", display: '6.7" FHD+ pOLED 120Hz', camera: "50MP Main + 13MP UW", battery: "5000 mAh", scores: { cam: 7, perf: 6, bat: 8, disp: 8 } },
-      { id: "mot-e60", brand: "Motorola", name: "Motorola Edge 60", price: 26999, releaseDate: "Expected: April 2025", processor: "MediaTek Dimensity 7300", display: '6.67" 1.5K pOLED 120Hz', camera: "50MP Main + 13MP UW", battery: "5000 mAh", scores: { cam: 7, perf: 7, bat: 8, disp: 8 } },
-      { id: "mot-e50u", brand: "Motorola", name: "Motorola Edge 50 Ultra", price: 59999, releaseDate: "May 2024", processor: "Snapdragon 8s Gen 3", display: '6.7" 1.5K pOLED 144Hz', camera: "50MP Main + 50MP UW + 64MP 3x Periscope", battery: "4500 mAh", scores: { cam: 9, perf: 8, bat: 7, disp: 9 } },
-      { id: "mot-e50f", brand: "Motorola", name: "Motorola Edge 50 Fusion", price: 22999, releaseDate: "May 2024", processor: "Snapdragon 7s Gen 2", display: '6.7" FHD+ pOLED 144Hz', camera: "50MP Sony LYT-700C + 13MP UW", battery: "5000 mAh", scores: { cam: 7, perf: 6, bat: 8, disp: 8 } },
-      { id: "mot-r70u", brand: "Motorola", name: "Motorola Razr 70 Ultra", price: 104999, releaseDate: "Expected: June 2026", processor: "Snapdragon 8s Gen 4", display: '6.9" FHD+ pOLED 165Hz Foldable', camera: "50MP Main + 50MP 2x Telephoto", battery: "4200 mAh", scores: { cam: 8, perf: 9, bat: 6, disp: 10 } },
-      { id: "mot-g96", brand: "Motorola", name: "Motorola Moto G96 5G", price: 18999, releaseDate: "Expected: July 2026", processor: "Snapdragon 6s Gen 3", display: '6.67" pOLED 120Hz', camera: "50MP OIS + 8MP UW", battery: "5000 mAh", scores: { cam: 6, perf: 6, bat: 8, disp: 8 } },
-      { id: "mot-g67pwr", brand: "Motorola", name: "Motorola Moto G67 Power 5G", price: 15999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 7025", display: '6.5" FHD+ LCD 120Hz', camera: "50MP OIS + 8MP UW", battery: "6000 mAh", scores: { cam: 6, perf: 6, bat: 10, disp: 6 } },
-      { id: "mot-g57pwr", brand: "Motorola", name: "Motorola Moto G57 Power", price: 13999, releaseDate: "Upcoming", processor: "Snapdragon 6s Gen 3", display: '6.5" FHD+ LCD 120Hz', camera: "50MP Main Camera", battery: "6000 mAh", scores: { cam: 5, perf: 5, bat: 10, disp: 6 } },
-      { id: "mot-g56", brand: "Motorola", name: "Motorola Moto G56 5G", price: 12999, releaseDate: "Upcoming", processor: "Snapdragon 6s Gen 3", display: '6.5" HD+ LCD 120Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 5 } },
-      { id: "mot-g06pwr", brand: "Motorola", name: "Motorola Moto G06 Power", price: 8999, releaseDate: "Upcoming", processor: "UNISOC T606", display: '6.56" HD+ LCD 90Hz', camera: "13MP Main Camera", battery: "6000 mAh", scores: { cam: 3, perf: 4, bat: 10, disp: 4 } },
-
-      // GOOGLE
-      { id: "goog-p11pro", brand: "Google", name: "Google Pixel 11 Pro", price: 119999, releaseDate: "Expected: October 2026", processor: "Google Tensor G6", display: '6.3" Super Actua OLED 120Hz', camera: "50MP Main + 48MP UW + 48MP 5x Telephoto", battery: "4800 mAh", scores: { cam: 10, perf: 9, bat: 8, disp: 10 } },
-      { id: "goog-p10profold", brand: "Google", name: "Google Pixel 10 Pro Fold", price: 172999, releaseDate: "Expected: August 2025", processor: "Google Tensor G5", display: '8.0" LTPO OLED 120Hz Foldable', camera: "48MP Main + 10.5MP UW + 10.8MP 5x Telephoto", battery: "4650 mAh", scores: { cam: 9, perf: 8, bat: 7, disp: 10 } },
-      { id: "goog-p10pro", brand: "Google", name: "Google Pixel 10 Pro", price: 109999, releaseDate: "Expected: August 2025", processor: "Google Tensor G5", display: '6.3" Super Actua OLED 120Hz', camera: "50MP Main + 48MP UW + 48MP 5x Telephoto", battery: "4700 mAh", scores: { cam: 10, perf: 8, bat: 8, disp: 10 } },
-      { id: "goog-p10", brand: "Google", name: "Google Pixel 10", price: 79999, releaseDate: "Expected: August 2025", processor: "Google Tensor G5", display: '6.3" Actua OLED 120Hz', camera: "50MP Main + 48MP Ultra-Wide", battery: "4700 mAh", scores: { cam: 9, perf: 8, bat: 8, disp: 9 } },
-      { id: "goog-p10a", brand: "Google", name: "Google Pixel 10a", price: 54999, releaseDate: "Expected: May 2026", processor: "Google Tensor G5", display: '6.1" OLED 120Hz', camera: "64MP Main + 13MP Ultra-Wide", battery: "4500 mAh", scores: { cam: 8, perf: 7, bat: 7, disp: 8 } },
-      { id: "goog-p9a", brand: "Google", name: "Google Pixel 9a", price: 49999, releaseDate: "Expected: March 2025", processor: "Google Tensor G4", display: '6.1" OLED 120Hz', camera: "48MP Main + 13MP Ultra-Wide", battery: "4650 mAh", scores: { cam: 8, perf: 7, bat: 7, disp: 8 } },
-      { id: "goog-p9", brand: "Google", name: "Google Pixel 9", price: 79999, releaseDate: "August 2024", processor: "Google Tensor G4", display: '6.3" Actua OLED 120Hz', camera: "50MP Main + 48MP Ultra-Wide", battery: "4700 mAh", scores: { cam: 9, perf: 8, bat: 7, disp: 9 } },
-
-      // NOTHING / CMF
-      { id: "not-4", brand: "Nothing", name: "Nothing Phone 4", price: 44999, releaseDate: "Expected: July 2026", processor: "Snapdragon 8s Gen 4", display: '6.7" LTPO OLED 120Hz', camera: "50MP Main + 50MP UW + 50MP Telephoto", battery: "5000 mAh", scores: { cam: 8, perf: 9, bat: 8, disp: 9 } },
-      { id: "not-4a", brand: "Nothing", name: "Nothing Phone 4a", price: 26999, releaseDate: "Expected: March 2026", processor: "MediaTek Dimensity 7400", display: '6.7" AMOLED 120Hz', camera: "50MP Main + 50MP Ultra-Wide", battery: "5000 mAh", scores: { cam: 7, perf: 7, bat: 8, disp: 8 } },
-      { id: "not-3ap", brand: "Nothing", name: "Nothing Phone (3a) Pro", price: 29999, releaseDate: "Expected: March 2025", processor: "MediaTek Dimensity 7350 Pro", display: '6.7" AMOLED 120Hz', camera: "50MP Main + 50MP UW + 50MP Front", battery: "5000 mAh", scores: { cam: 8, perf: 7, bat: 8, disp: 8 } },
-      { id: "not-3a", brand: "Nothing", name: "Nothing Phone (3a)", price: 24999, releaseDate: "Expected: March 2025", processor: "MediaTek Dimensity 7200 Pro", display: '6.7" AMOLED 120Hz', camera: "50MP Main + 50MP Ultra-Wide", battery: "5000 mAh", scores: { cam: 7, perf: 7, bat: 8, disp: 8 } },
-      { id: "cmf-2p", brand: "Nothing", name: "CMF by Nothing Phone 2 Pro", price: 18999, releaseDate: "Expected: July 2025", processor: "MediaTek Dimensity 7300", display: '6.67" Super AMOLED 120Hz', camera: "50MP Sony Main + 8MP UW", battery: "5000 mAh", scores: { cam: 6, perf: 7, bat: 8, disp: 8 } },
-
-      // TECNO
-      { id: "tec-p8p", brand: "Tecno", name: "Tecno Pova 8 Pro", price: 16999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 6300", display: '6.78" FHD+ 120Hz AMOLED', camera: "50MP Main + 2MP Depth", battery: "6000 mAh", scores: { cam: 5, perf: 6, bat: 10, disp: 7 } },
-      { id: "tec-pslim", brand: "Tecno", name: "Tecno POVA Slim", price: 13999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 6080", display: '6.78" FHD+ 120Hz AMOLED', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 7 } },
-
-      // INFINIX
-      { id: "inf-gt50p", brand: "Infinix", name: "Infinix GT 50 Pro", price: 24999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 8300", display: '6.78" FHD+ 144Hz AMOLED', camera: "108MP OIS + 8MP UW", battery: "5500 mAh", scores: { cam: 7, perf: 8, bat: 9, disp: 9 } },
-      { id: "inf-n60p", brand: "Infinix", name: "Infinix Note 60 Pro Pininfarina Limited Edition", price: 22999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 7300", display: '6.78" 3D Curved AMOLED 120Hz', camera: "108MP OIS + 2MP Macro", battery: "5000 mAh", scores: { cam: 7, perf: 7, bat: 8, disp: 8 } },
-      { id: "inf-h70p", brand: "Infinix", name: "Infinix Hot 70 Pro 5G", price: 14999, releaseDate: "Upcoming", processor: "MediaTek Dimensity 6300", display: '6.78" FHD+ 120Hz LCD', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 5, perf: 6, bat: 8, disp: 6 } },
-
-      // LAVA
-      { id: "lav-a3", brand: "Lava", name: "Lava Agni 3 5G", price: 20999, releaseDate: "October 2024", processor: "MediaTek Dimensity 7300X", display: '6.78" 1.5K Curved AMOLED 120Hz + Rear Display', camera: "50MP OIS + 8MP UW + 8MP Telephoto", battery: "5000 mAh", scores: { cam: 7, perf: 7, bat: 8, disp: 9 } },
-      { id: "lav-bp", brand: "Lava", name: "Lava Blaze Pro 5G", price: 12499, releaseDate: "November 2023", processor: "MediaTek Dimensity 6020", display: '6.78" FHD+ 120Hz LCD', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 5, perf: 5, bat: 8, disp: 6 } },
-      { id: "lav-bn4l", brand: "Lava", name: "Lava Bold N4 Lite", price: 7999, releaseDate: "Upcoming", processor: "UNISOC T606", display: '6.5" HD+ LCD 90Hz', camera: "13MP Main Camera", battery: "5000 mAh", scores: { cam: 3, perf: 4, bat: 8, disp: 4 } },
-      { id: "lav-y4", brand: "Lava", name: "Lava Yuva 4", price: 6999, releaseDate: "November 2024", processor: "UNISOC T606", display: '6.56" HD+ LCD 90Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 4, perf: 4, bat: 8, disp: 4 } },
-
-      // ITEL
-      { id: "itl-s24", brand: "Itel", name: "Itel S24", price: 9999, releaseDate: "April 2024", processor: "MediaTek Helio G91", display: '6.6" HD+ LCD 90Hz', camera: "108MP Main Camera", battery: "5000 mAh", scores: { cam: 5, perf: 4, bat: 8, disp: 5 } },
-      { id: "itl-p55p", brand: "Itel", name: "Itel P55+", price: 9499, releaseDate: "February 2024", processor: "UNISOC T606", display: '6.6" HD+ LCD 90Hz', camera: "50MP Main Camera", battery: "5000 mAh", scores: { cam: 4, perf: 4, bat: 8, disp: 5 } },
-      { id: "itl-a70", brand: "Itel", name: "Itel A70", price: 6299, releaseDate: "January 2024", processor: "UNISOC T603", display: '6.6" HD+ LCD 60Hz', camera: "13MP Main Camera", battery: "5000 mAh", scores: { cam: 3, perf: 3, bat: 8, disp: 4 } }
-    ];
-
-    // State Management
-    let compareList = [];
-
-    // Navigation Switcher
-    function switchTab(tabId) {
-      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.view-container').forEach(view => view.classList.remove('active'));
-
-      event.currentTarget.classList.add('active');
-      document.getElementById(`${tabId}-view`).classList.add('active');
-
-      if (tabId === 'catalog') renderCatalog();
-      if (tabId === 'compare') renderComparison();
-    }
-
-    // Recommendation Algorithm
-    function calculateSuitability(phone) {
-      const wCam = parseInt(document.getElementById('weight-cam').value);
-      const wPerf = parseInt(document.getElementById('weight-perf').value);
-      const wBat = parseInt(document.getElementById('weight-bat').value);
-      const wDisp = parseInt(document.getElementById('weight-disp').value);
-
-      const totalWeight = wCam + wPerf + wBat + wDisp;
-      
-      const weightedScore = (
-        (phone.scores.cam * wCam) +
-        (phone.scores.perf * wPerf) +
-        (phone.scores.bat * wBat) +
-        (phone.scores.disp * wDisp)
-      );
-
-      // Scale to 0-100%
-      return Math.round((weightedScore / (totalWeight * 10)) * 100);
-    }
-
-    function updateFilters() {
-      // Update UI slider readouts
-      const budget = parseInt(document.getElementById('budget-slider').value);
-      document.getElementById('budget-val').innerText = `₹${budget.toLocaleString('en-IN')}`;
-      
-      document.getElementById('weight-cam-val').innerText = document.getElementById('weight-cam').value;
-      document.getElementById('weight-perf-val').innerText = document.getElementById('weight-perf').value;
-      document.getElementById('weight-bat-val').innerText = document.getElementById('weight-bat').value;
-      document.getElementById('weight-disp-val').innerText = document.getElementById('weight-disp').value;
-
-      renderRecommendations();
-    }
-
-    function resetFilters() {
-      document.getElementById('budget-slider').value = 200000;
-      document.getElementById('brand-select').value = 'ALL';
-      document.getElementById('weight-cam').value = 5;
-      document.getElementById('weight-perf').value = 5;
-      document.getElementById('weight-bat').value = 5;
-      document.getElementById('weight-disp').value = 5;
-      updateFilters();
-    }
-
-    function renderRecommendations() {
-      const budget = parseInt(document.getElementById('budget-slider').value);
-      const selectedBrand = document.getElementById('brand-select').value;
-      const grid = document.getElementById('recommendations-grid');
-
-      let filtered = phoneDatabase.filter(phone => {
-        const matchesBudget = phone.price <= budget;
-        const matchesBrand = selectedBrand === 'ALL' || phone.brand === selectedBrand || (selectedBrand === 'Xiaomi' && (phone.brand === 'Xiaomi' || phone.brand === 'Redmi')) || (selectedBrand === 'Nothing' && phone.brand === 'Nothing');
-        return matchesBudget && matchesBrand;
-      });
-
-      // Sort by suitability score
-      filtered.forEach(phone => phone.currentMatch = calculateSuitability(phone));
-      filtered.sort((a, b) => b.currentMatch - a.currentMatch);
-
-      if (filtered.length === 0) {
-        grid.innerHTML = `
-          <div class="empty-state" style="grid-column: 1/-1;">
-            <i class="fa-solid fa-filter-circle-xmark"></i>
-            <h3>No devices match your criteria</h3>
-            <p>Try increasing your budget ceiling or resetting brand filters.</p>
-          </div>
-        `;
-        return;
-      }
-
-      grid.innerHTML = filtered.map(phone => createPhoneCard(phone, true)).join('');
-    }
-
-    function renderCatalog() {
-      const search = document.getElementById('search-bar').value.toLowerCase();
-      const sortBy = document.getElementById('sort-select').value;
-      const grid = document.getElementById('catalog-grid');
-
-      let filtered = phoneDatabase.filter(p => 
-        p.name.toLowerCase().includes(search) || 
-        p.brand.toLowerCase().includes(search) ||
-        p.processor.toLowerCase().includes(search)
-      );
-
-      // Apply Sorting
-      filtered.forEach(phone => phone.currentMatch = calculateSuitability(phone));
-
-      if (sortBy === 'recommended') {
-        filtered.sort((a, b) => b.currentMatch - a.currentMatch);
-      } else if (sortBy === 'newest') {
-        filtered.sort((a, b) => parseReleaseDate(b.releaseDate) - parseReleaseDate(a.releaseDate));
-      } else if (sortBy === 'oldest') {
-        filtered.sort((a, b) => parseReleaseDate(a.releaseDate) - parseReleaseDate(b.releaseDate));
-      } else if (sortBy === 'price-asc') {
-        filtered.sort((a, b) => a.price - b.price);
-      } else if (sortBy === 'price-desc') {
-        filtered.sort((a, b) => b.price - a.price);
-      } else if (sortBy === 'name-asc') {
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
-      }
-
-      grid.innerHTML = filtered.map(phone => createPhoneCard(phone, false)).join('');
-    }
-
-    function createPhoneCard(phone, showMatchBadge) {
-      const isCompared = compareList.some(item => item.id === phone.id);
-      const isUpcoming = phone.releaseDate.includes('Upcoming') || phone.releaseDate.includes('Expected');
-
-      return `
-        <div class="phone-card">
-          ${showMatchBadge ? `<div class="suitability-badge">${phone.currentMatch}% Match</div>` : ''}
-          <div>
-            <span class="phone-brand">${phone.brand}</span>
-            <h3 class="phone-name">${phone.name}</h3>
-            <div class="release-badge ${isUpcoming ? 'upcoming' : ''}">
-              <i class="fa-regular fa-calendar"></i> ${phone.releaseDate.includes('Expected') || phone.releaseDate.includes('Upcoming') ? phone.releaseDate : 'Released: ' + phone.releaseDate}
+    <div class="main-layout">
+        <aside class="panel">
+            <h2>Recommendation Engine</h2>
+            
+            <div class="form-group">
+                <label for="budget">Max Budget ($)</label>
+                <input type="range" id="budget" min="100" max="2000" step="50" value="2000">
+                <div class="range-val" id="budget-val">$2000</div>
             </div>
-            <div class="phone-price">₹${phone.price.toLocaleString('en-IN')}</div>
-            <ul class="specs-list">
-              <li><i class="fa-solid fa-microchip"></i> ${phone.processor}</li>
-              <li><i class="fa-solid fa-mobile-screen"></i> ${phone.display}</li>
-              <li><i class="fa-solid fa-camera"></i> ${phone.camera}</li>
-              <li><i class="fa-solid fa-battery-full"></i> ${phone.battery}</li>
-            </ul>
-          </div>
-          <div class="card-actions">
-            <button class="btn-action ${isCompared ? 'active' : ''}" onclick="toggleCompare('${phone.id}')">
-              <i class="fa-solid ${isCompared ? 'fa-check' : 'fa-plus'}"></i> ${isCompared ? 'Added' : 'Compare'}
-            </button>
-          </div>
-        </div>
-      `;
-    }
 
-    function toggleCompare(phoneId) {
-      const index = compareList.findIndex(p => p.id === phoneId);
-      if (index > -1) {
-        compareList.splice(index, 1);
-      } else {
-        if (compareList.length >= 4) {
-          alert("You can compare up to 4 smartphones simultaneously.");
-          return;
+            <div class="form-group">
+                <label for="brand-filter">Brand Filter</label>
+                <select id="brand-filter">
+                    <option value="All">All Brands</option>
+                    <option value="OPPO">OPPO</option>
+                    <option value="Xiaomi">Xiaomi</option>
+                    <option value="Realme">Realme</option>
+                    <option value="Tecno">Tecno</option>
+                    <option value="Nothing">Nothing</option>
+                </select>
+            </div>
+
+            <hr style="border-color: var(--border); margin: 20px 0;">
+
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Priorities (Weights)</p>
+
+            <div class="form-group">
+                <label for="p-camera">Camera Priority</label>
+                <input type="range" id="p-camera" min="0" max="10" value="5">
+            </div>
+
+            <div class="form-group">
+                <label for="p-gaming">Gaming & Speed Priority</label>
+                <input type="range" id="p-gaming" min="0" max="10" value="5">
+            </div>
+
+            <div class="form-group">
+                <label for="p-battery">Battery Life Priority</label>
+                <input type="range" id="p-battery" min="0" max="10" value="5">
+            </div>
+
+            <div class="form-group">
+                <label for="p-display">Display Priority</label>
+                <input type="range" id="p-display" min="0" max="10" value="5">
+            </div>
+        </aside>
+
+        <main>
+            <div class="catalog-controls">
+                <input type="text" id="search-input" placeholder="Search phone name, specs...">
+                <select id="sort-select">
+                    <option value="recommended">Recommended</option>
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="price-asc">Price: Low → High</option>
+                    <option value="price-desc">Price: High → Low</option>
+                    <option value="name-asc">Name: A → Z</option>
+                </select>
+            </div>
+
+            <div class="phone-grid" id="phone-grid">
+                </div>
+        </main>
+    </div>
+
+    <section class="compare-section" id="compare-section">
+        <div class="compare-header">
+            <h2>Phone Comparison (<span id="compare-count">0</span>/4)</h2>
+            <button class="btn" style="width: auto; padding: 6px 15px; background-color: #ef4444;" onclick="clearComparison()">Clear All</button>
+        </div>
+        <div class="compare-table-wrapper" id="compare-table-wrapper">
+            <p style="color: var(--text-muted);">Select up to 4 phones from the catalog above to compare specs side-by-side.</p>
+        </div>
+    </section>
+
+    <script>
+        const phoneDatabase = [
+            // OPPO Models Mandatory Collection
+            { name: "OPPO Find X9 Ultra", brand: "OPPO", price: 1200, releaseDate: "Upcoming", camera: 10, gaming: 10, battery: 9, display: 10, chip: "Snapdragon 8 Gen 4", batteryCap: "5500 mAh" },
+            { name: "OPPO Find X7 Pro Ultra", brand: "OPPO", price: 1100, releaseDate: "January 2024", camera: 10, gaming: 9, battery: 8, display: 10, chip: "Snapdragon 8 Gen 3", batteryCap: "5000 mAh" },
+            { name: "OPPO Find N3 Flip", brand: "OPPO", price: 999, releaseDate: "October 2023", camera: 8, gaming: 8, battery: 7, display: 9, chip: "Dimensity 9200", batteryCap: "4300 mAh" },
+            { name: "OPPO Reno16 Pro 5G", brand: "OPPO", price: 650, releaseDate: "Upcoming", camera: 9, gaming: 8, battery: 9, display: 9, chip: "Dimensity 8400", batteryCap: "5500 mAh" },
+            { name: "OPPO Reno 16c", brand: "OPPO", price: 350, releaseDate: "Expected: October 2026", camera: 7, gaming: 7, battery: 8, display: 7, chip: "Dimensity 7050", batteryCap: "5000 mAh" },
+            { name: "OPPO Reno 14", brand: "OPPO", price: 480, releaseDate: "May 2025", camera: 8, gaming: 8, battery: 8, display: 8, chip: "Dimensity 8300", batteryCap: "5000 mAh" },
+            { name: "OPPO Reno 13F 5G", brand: "OPPO", price: 320, releaseDate: "January 2025", camera: 7, gaming: 6, battery: 8, display: 8, chip: "Snapdragon 6 Gen 1", batteryCap: "5000 mAh" },
+            { name: "OPPO K15 Pro", brand: "OPPO", price: 400, releaseDate: "Upcoming", camera: 8, gaming: 9, battery: 9, display: 8, chip: "Snapdragon 8s Gen 3", batteryCap: "5500 mAh" },
+            { name: "OPPO K14x 5G", brand: "OPPO", price: 220, releaseDate: "Expected: November 2026", camera: 6, gaming: 6, battery: 9, display: 7, chip: "Dimensity 6100+", batteryCap: "5000 mAh" },
+            { name: "OPPO K13 Turbo Pro", brand: "OPPO", price: 380, releaseDate: "August 2025", camera: 8, gaming: 9, battery: 9, display: 9, chip: "Snapdragon 8s Gen 4", batteryCap: "6000 mAh" },
+            { name: "OPPO K13 5G", brand: "OPPO", price: 250, releaseDate: "April 2025", camera: 7, gaming: 7, battery: 10, display: 8, chip: "Snapdragon 6 Gen 4", batteryCap: "7000 mAh" },
+            { name: "OPPO K13x 5G", brand: "OPPO", price: 180, releaseDate: "June 2025", camera: 6, gaming: 6, battery: 9, display: 7, chip: "Dimensity 6300", batteryCap: "5100 mAh" },
+            { name: "OPPO A6s 5G", brand: "OPPO", price: 210, releaseDate: "Expected: December 2026", camera: 6, gaming: 6, battery: 9, display: 7, chip: "Snapdragon 4 Gen 2", batteryCap: "5000 mAh" },
+            { name: "OPPO A3 Pro 5G", brand: "OPPO", price: 240, releaseDate: "April 2024", camera: 6, gaming: 6, battery: 9, display: 7, chip: "Dimensity 7050", batteryCap: "5000 mAh" },
+
+            // Existing Models Retained
+            { name: "Xiaomi 14 Civi", brand: "Xiaomi", price: 520, releaseDate: "June 2024", camera: 9, gaming: 9, battery: 7, display: 9, chip: "Snapdragon 8s Gen 3", batteryCap: "4700 mAh" },
+            { name: "Realme GT 7", brand: "Realme", price: 650, releaseDate: "May 2025", camera: 8, gaming: 10, battery: 10, display: 9, chip: "Dimensity 9400e", batteryCap: "7000 mAh" },
+            { name: "Tecno Pova 6 Pro 5G", brand: "Tecno", price: 230, releaseDate: "March 2024", camera: 6, gaming: 7, battery: 9, display: 8, chip: "Dimensity 6080", batteryCap: "6000 mAh" },
+            { name: "Nothing Phone (2)", brand: "Nothing", price: 599, releaseDate: "July 2023", camera: 8, gaming: 8, battery: 8, display: 9, chip: "Snapdragon 8+ Gen 1", batteryCap: "4700 mAh" }
+        ];
+
+        let selectedForCompare = [];
+
+        // DOM Handles
+        const budgetInput = document.getElementById('budget');
+        const budgetVal = document.getElementById('budget-val');
+        const brandFilter = document.getElementById('brand-filter');
+        const pCamera = document.getElementById('p-camera');
+        const pGaming = document.getElementById('p-gaming');
+        const pBattery = document.getElementById('p-battery');
+        const pDisplay = document.getElementById('p-display');
+        const searchInput = document.getElementById('search-input');
+        const sortSelect = document.getElementById('sort-select');
+        const phoneGrid = document.getElementById('phone-grid');
+
+        // Helper: Convert date strings to timestamps for strict ordering
+        function parseReleaseDate(dateStr) {
+            if (dateStr.startsWith("Upcoming")) return 9999999999999;
+            if (dateStr.startsWith("Expected:")) {
+                const cleaned = dateStr.replace("Expected:", "").trim();
+                return new Date(cleaned).getTime() || 8888888888888;
+            }
+            return new Date(dateStr).getTime() || 0;
         }
-        const phone = phoneDatabase.find(p => p.id === phoneId);
-        if (phone) compareList.push(phone);
-      }
 
-      document.getElementById('compare-count').innerText = compareList.length;
-      
-      // Re-render current visible section
-      if (document.getElementById('recommendations-view').classList.contains('active')) renderRecommendations();
-      if (document.getElementById('catalog-view').classList.contains('active')) renderCatalog();
-      if (document.getElementById('compare-view').classList.contains('active')) renderComparison();
-    }
+        function calculateMatchScore(phone) {
+            const wCam = parseInt(pCamera.value);
+            const wGam = parseInt(pGaming.value);
+            const wBat = parseInt(pBattery.value);
+            const wDis = parseInt(pDisplay.value);
 
-    function renderComparison() {
-      const container = document.getElementById('compare-content');
+            const maxScore = (wCam + wGam + wBat + wDis) * 10;
+            if (maxScore === 0) return 100;
 
-      if (compareList.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <i class="fa-solid fa-scale-unbalanced-flip"></i>
-            <h3>No Phones Selected for Comparison</h3>
-            <p>Browse the catalog or recommendations engine and click "+ Compare" to add up to 4 devices.</p>
-          </div>
-        `;
-        return;
-      }
+            const actualScore = (phone.camera * wCam) + (phone.gaming * wGam) + (phone.battery * wBat) + (phone.display * wDis);
+            return Math.round((actualScore / maxScore) * 100);
+        }
 
-      container.innerHTML = `
-        <div class="comparison-container">
-          <table class="comparison-table">
-            <thead>
-              <tr>
-                <th>Specification</th>
-                ${compareList.map(p => `
-                  <th>
-                    <div style="font-weight:700; font-size:1.1rem; color:var(--text-main);">${p.name}</div>
-                    <div style="color:var(--accent); font-size:0.95rem;">₹${p.price.toLocaleString('en-IN')}</div>
-                    <button class="btn-action" style="margin-top:0.5rem; padding:0.25rem 0.5rem; font-size:0.75rem;" onclick="toggleCompare('${p.id}')">Remove</button>
-                  </th>
-                `).join('')}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Brand</td>
-                ${compareList.map(p => `<td>${p.brand}</td>`).join('')}
-              </tr>
-              <tr>
-                <td>Release Date</td>
-                ${compareList.map(p => `<td>${p.releaseDate}</td>`).join('')}
-              </tr>
-              <tr>
-                <td>Processor</td>
-                ${compareList.map(p => `<td>${p.processor}</td>`).join('')}
-              </tr>
-              <tr>
-                <td>Display</td>
-                ${compareList.map(p => `<td>${p.display}</td>`).join('')}
-              </tr>
-              <tr>
-                <td>Camera Setup</td>
-                ${compareList.map(p => `<td>${p.camera}</td>`).join('')}
-              </tr>
-              <tr>
-                <td>Battery Capacity</td>
-                ${compareList.map(p => `<td>${p.battery}</td>`).join('')}
-              </tr>
-              <tr>
-                <td>Camera Score</td>
-                ${compareList.map(p => `<td>${p.scores.cam}/10</td>`).join('')}
-              </tr>
-              <tr>
-                <td>Performance Score</td>
-                ${compareList.map(p => `<td>${p.scores.perf}/10</td>`).join('')}
-              </tr>
-              <tr>
-                <td>Battery Score</td>
-                ${compareList.map(p => `<td>${p.scores.bat}/10</td>`).join('')}
-              </tr>
-              <tr>
-                <td>Display Score</td>
-                ${compareList.map(p => `<td>${p.scores.disp}/10</td>`).join('')}
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      `;
-    }
+        function renderCatalog() {
+            const maxBudget = parseInt(budgetInput.value);
+            const selectedBrand = brandFilter.value;
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const sortMode = sortSelect.value;
 
-    // Initial Execution
-    updateFilters();
-  </script>
+            // 1. Filter
+            let filtered = phoneDatabase.filter(phone => {
+                const matchesBudget = phone.price <= maxBudget;
+                const matchesBrand = selectedBrand === "All" || phone.brand === selectedBrand;
+                const matchesSearch = phone.name.toLowerCase().includes(searchTerm) || 
+                                      phone.chip.toLowerCase().includes(searchTerm) ||
+                                      phone.brand.toLowerCase().includes(searchTerm);
+                return matchesBudget && matchesBrand && matchesSearch;
+            });
+
+            // 2. Map Match Scores
+            filtered = filtered.map(phone => ({
+                ...phone,
+                matchScore: calculateMatchScore(phone)
+            }));
+
+            // 3. Sort
+            filtered.sort((a, b) => {
+                if (sortMode === "recommended") return b.matchScore - a.matchScore;
+                if (sortMode === "price-asc") return a.price - b.price;
+                if (sortMode === "price-desc") return b.price - a.price;
+                if (sortMode === "name-asc") return a.name.localeCompare(b.name);
+                if (sortMode === "newest") return parseReleaseDate(b.releaseDate) - parseReleaseDate(a.releaseDate);
+                if (sortMode === "oldest") return parseReleaseDate(a.releaseDate) - parseReleaseDate(b.releaseDate);
+                return 0;
+            });
+
+            // 4. Render
+            phoneGrid.innerHTML = "";
+            if (filtered.length === 0) {
+                phoneGrid.innerHTML = `<div class="no-results">No smartphones match your exact search and filter criteria.</div>`;
+                return;
+            }
+
+            filtered.forEach(phone => {
+                const isSelected = selectedForCompare.some(p => p.name === phone.name);
+                const card = document.createElement('div');
+                card.className = "phone-card";
+                card.innerHTML = `
+                    <span class="match-badge">${phone.matchScore}% Match</span>
+                    <div>
+                        <div class="brand-tag">${phone.brand}</div>
+                        <h3>${phone.name}</h3>
+                        <div class="release-date-tag">📅 Released: ${phone.releaseDate}</div>
+                        <div class="price-tag">$${phone.price}</div>
+                        <ul class="specs-list">
+                            <li><span>Chipset:</span> <strong>${phone.chip}</strong></li>
+                            <li><span>Battery:</span> <strong>${phone.batteryCap}</strong></li>
+                            <li><span>Camera Score:</span> <strong>${phone.camera}/10</strong></li>
+                            <li><span>Gaming Score:</span> <strong>${phone.gaming}/10</strong></li>
+                        </ul>
+                    </div>
+                    <button class="btn ${isSelected ? 'selected' : ''}" onclick="toggleCompare('${phone.name}')">
+                        ${isSelected ? '✓ Added to Compare' : '+ Compare'}
+                    </button>
+                `;
+                phoneGrid.appendChild(card);
+            });
+        }
+
+        function toggleCompare(phoneName) {
+            const index = selectedForCompare.findIndex(p => p.name === phoneName);
+            if (index > -1) {
+                selectedForCompare.splice(index, 1);
+            } else {
+                if (selectedForCompare.length >= 4) {
+                    alert("You can compare up to 4 phones maximum.");
+                    return;
+                }
+                const phone = phoneDatabase.find(p => p.name === phoneName);
+                if (phone) selectedForCompare.push(phone);
+            }
+            renderCatalog();
+            renderComparison();
+        }
+
+        function clearComparison() {
+            selectedForCompare = [];
+            renderCatalog();
+            renderComparison();
+        }
+
+        function renderComparison() {
+            const wrapper = document.getElementById('compare-table-wrapper');
+            document.getElementById('compare-count').innerText = selectedForCompare.length;
+
+            if (selectedForCompare.length === 0) {
+                wrapper.innerHTML = `<p style="color: var(--text-muted);">Select up to 4 phones from the catalog above to compare specs side-by-side.</p>`;
+                return;
+            }
+
+            let tableHTML = `<table class="compare-table"><thead><tr><th>Specification</th>`;
+            selectedForCompare.forEach(p => {
+                tableHTML += `<th>${p.name}</th>`;
+            });
+            tableHTML += `</tr></thead><tbody>`;
+
+            const rows = [
+                { label: "Brand", key: "brand" },
+                { label: "Price", key: "price", format: v => `$${v}` },
+                { label: "Release Date", key: "releaseDate" },
+                { label: "Chipset", key: "chip" },
+                { label: "Battery Capacity", key: "batteryCap" },
+                { label: "Camera Rating", key: "camera", format: v => `${v}/10` },
+                { label: "Gaming Rating", key: "gaming", format: v => `${v}/10` },
+                { label: "Display Rating", key: "display", format: v => `${v}/10` }
+            ];
+
+            rows.forEach(row => {
+                tableHTML += `<tr><strong><td>${row.label}</td></strong>`;
+                selectedForCompare.forEach(p => {
+                    const val = row.format ? row.format(p[row.key]) : p[row.key];
+                    tableHTML += `<td>${val}</td>`;
+                });
+                tableHTML += `</tr>`;
+            });
+
+            tableHTML += `</tbody></table>`;
+            wrapper.innerHTML = tableHTML;
+        }
+
+        // Event Listeners
+        budgetInput.addEventListener('input', (e) => {
+            budgetVal.innerText = `$${e.target.value}`;
+            renderCatalog();
+        });
+
+        [brandFilter, pCamera, pGaming, pBattery, pDisplay, searchInput, sortSelect].forEach(element => {
+            element.addEventListener('input', renderCatalog);
+        });
+
+        // Initialize App
+        renderCatalog();
+    </script>
 </body>
 </html>
